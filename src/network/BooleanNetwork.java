@@ -80,4 +80,28 @@ public class BooleanNetwork {
             }
         }
     }
+
+    public List<State> trace(int[] startingState) {
+        currentState = new State(startingState);
+        List<State> trace = new ArrayList<>();
+        trace.add(currentState);
+        State newState;
+
+        while (true) {
+            System.out.println(currentState);
+            System.out.println(transitions.get(currentState));
+
+            newState = transitions.get(currentState);
+
+            if (trace.contains(newState)) {
+                trace.add(newState);
+                currentState = newState;
+                break;
+            }
+            trace.add(newState);
+            currentState = newState;
+        }
+        System.out.println(trace);
+        return trace;
+    }
 }
