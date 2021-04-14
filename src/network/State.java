@@ -11,9 +11,7 @@ public class State {
 
     @Override
     public String toString() {
-        return "State{" +
-                "nodeStates=" + Arrays.toString(nodeStates) +
-                '}';
+        return Arrays.toString(nodeStates);
     }
 
     @Override

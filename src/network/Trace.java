@@ -17,4 +17,9 @@ public class Trace {
         int start = trace.indexOf(trace.get(trace.size() - 1));
         return trace.subList(start, trace.size());
     }
+
+    @Override
+    public String toString() {
+        return trace.toString();
+    }
 }

@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class BooleanNetwork {
-    private State currentState;
-    List<Node> nodes = new ArrayList<>();
+    public List<Node> nodes = new ArrayList<>();
     Map<State, State> transitions = new HashMap<>();
 
     public BooleanNetwork(String path) throws IOException, NetworkCreationException {
@@ -29,7 +28,6 @@ public class BooleanNetwork {
         while ((line = reader.readLine()) != null) {
             lines.add(Arrays.asList(line.split(",")));
         }
-        System.out.println(lines);
 
         List<String> headings = lines.remove(0);
 
@@ -47,7 +45,6 @@ public class BooleanNetwork {
         for (int x = 0; x < headings.size() / 2; x++) {
             nodes.add(new Node(x, headings.get(x)));
         }
-        System.out.println(nodes);
 
         for (List<String> t : lines) {
             // Check all values are present.
@@ -71,37 +68,26 @@ public class BooleanNetwork {
             int[] to = Arrays.copyOfRange(states, nodes.size(), states.length);
 
             // Store state transitions as map.
-            System.out.printf("%s -> %s\n", Arrays.toString(from), Arrays.toString(to));
             transitions.put(new State(from), new State(to));
-
-            System.out.println(currentState);
-            for (State i : transitions.keySet()) {
-                System.out.printf("%s -----> %s\n", i, transitions.get(i));
-            }
         }
     }
 
     public Trace trace(int[] startingState) {
-        currentState = new State(startingState);
+        State currentState = new State(startingState);
         List<State> trace = new ArrayList<>();
         trace.add(currentState);
         State newState;
 
         while (true) {
-            System.out.println(currentState);
-            System.out.println(transitions.get(currentState));
-
             newState = transitions.get(currentState);
 
             if (trace.contains(newState)) {
                 trace.add(newState);
-                currentState = newState;
                 break;
             }
             trace.add(newState);
             currentState = newState;
         }
-        System.out.println(trace);
         return new Trace(startingState, trace);
     }
 }
