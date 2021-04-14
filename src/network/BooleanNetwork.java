@@ -81,7 +81,7 @@ public class BooleanNetwork {
         }
     }
 
-    public List<State> trace(int[] startingState) {
+    public Trace trace(int[] startingState) {
         currentState = new State(startingState);
         List<State> trace = new ArrayList<>();
         trace.add(currentState);
@@ -102,6 +102,6 @@ public class BooleanNetwork {
             currentState = newState;
         }
         System.out.println(trace);
-        return trace;
+        return new Trace(startingState, trace);
     }
 }
