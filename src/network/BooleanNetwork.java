@@ -30,8 +30,6 @@ public class BooleanNetwork {
         }
 
         List<String> headings = lines.remove(0);
-        System.out.println(headings.subList(0, headings.size() / 2));
-        System.out.println(headings.subList(headings.size() / 2, headings.size()));
 
         if (headings.size() % 2 != 0) {
             throw new NetworkCreationException("There must be 2 headings per node, example - [g1,g2,g3,g1,g2,g3].");
