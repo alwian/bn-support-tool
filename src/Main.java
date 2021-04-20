@@ -1,5 +1,6 @@
 import network.BooleanNetwork;
 import network.NetworkCreationException;
+import network.NetworkTraceException;
 import network.Trace;
 
 import javax.swing.*;
@@ -64,7 +65,15 @@ public class Main {
         }
 
         System.out.print("Tracing network...");
-        Trace trace = network.trace(startingState);
+
+        Trace trace = null;
+        try {
+            trace = network.trace(startingState);
+        } catch (NetworkTraceException e) {
+            System.out.println(e.getMessage());
+            System.exit(-1);
+        }
+
         System.out.println("Network traced.\n");
 
         System.out.printf("Trace: %s\n", trace);

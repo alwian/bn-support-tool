@@ -30,6 +30,14 @@ public class BooleanNetwork {
         }
 
         List<String> headings = lines.remove(0);
+        System.out.println(headings.subList(0, headings.size() / 2));
+        System.out.println(headings.subList(headings.size() / 2, headings.size()));
+
+        if (headings.size() % 2 != 0) {
+            throw new NetworkCreationException("There must be 2 headings per node, example - [g1,g2,g3,g1,g2,g3].");
+        } else if (!headings.subList(0, headings.size() / 2).equals(headings.subList(headings.size() / 2, headings.size()))) {
+            throw new NetworkCreationException("Headings must be in the same order for before and after, example - [g1,g2,g3,g1,g2,g3].");
+        }
 
         // Check headings are correct.
         Map<String, Integer> headingCounts = new HashMap<>();
@@ -59,8 +67,7 @@ public class BooleanNetwork {
                 try {
                     states[x] = Integer.parseInt(t.get(x));
                 } catch (NumberFormatException e) {
-                    System.out.println(e.getMessage());
-                    System.exit(-1);
+                    throw new NetworkCreationException("States can only be 1 or 0.");
                 }
             }
 
@@ -72,7 +79,11 @@ public class BooleanNetwork {
         }
     }
 
-    public Trace trace(int[] startingState) {
+    public Trace trace(int[] startingState) throws NetworkTraceException {
+        if (startingState.length != nodes.size()) {
+            throw new NetworkTraceException(String.format("You must provide %d starting states.", nodes.size()));
+        }
+
         State currentState = new State(startingState);
         List<State> trace = new ArrayList<>();
         trace.add(currentState);
