@@ -2,9 +2,23 @@ package network;
 
 import java.util.Arrays;
 
+/**
+ * Class for storing the state of a network.
+ *
+ * @author Alex Anderson
+ */
 public class State {
+
+    /**
+     * The states of each node in the network.
+     */
     int[] nodeStates;
 
+    /**
+     * Constructor for a network state.
+     *
+     * @param nodeStates The state of each node in the network.
+     */
     public State(int[] nodeStates) {
         this.nodeStates = nodeStates;
     }
