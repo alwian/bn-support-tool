@@ -56,46 +56,55 @@ public class Main {
 
         // Get the desired startig state.
         int nodeCount = network.getNodes().size();
-        System.out.printf("Enter starting state (as %d consecutive integers): ", nodeCount);
-        Scanner scanner = new Scanner(System.in);
-        String[] startingStateStrings = scanner.nextLine().split("");
 
-        // Make sure te xtarting state was the right length.
-        if (startingStateStrings.length != nodeCount) {
-            System.out.println("Wrong number of node states entered.");
-            System.exit(-1);
-        }
+        String[] startingStateStrings = null;
 
-        // Make sure only 0 or 1 was entered for each state.
-        int[] startingState = new int[startingStateStrings.length];
-        for (int x = 0; x < startingStateStrings.length; x++) {
-            try {
-                startingState[x] = Integer.parseInt(startingStateStrings[x]);
-                if (startingState[x] != 1 && startingState[x] != 0) {
+        mainLoop:
+        while (true) {
+            System.out.printf("\nEnter starting state (as %d consecutive integers): ", nodeCount);
+            Scanner scanner = new Scanner(System.in);
+            startingStateStrings = scanner.nextLine().split("");
+
+            if (startingStateStrings.length == 1 && startingStateStrings[0].trim().equals("")) {
+                break;
+            }
+
+            // Make sure the starting state was the right length.
+            if (startingStateStrings.length != nodeCount) {
+                System.out.println("Wrong number of node states entered.");
+                continue;
+            }
+
+            // Make sure only 0 or 1 was entered for each state.
+            int[] startingState = new int[startingStateStrings.length];
+            for (int x = 0; x < startingStateStrings.length; x++) {
+                try {
+                    startingState[x] = Integer.parseInt(startingStateStrings[x]);
+                    if (startingState[x] != 1 && startingState[x] != 0) {
+                        System.out.println("States can only be 0 or 1.");
+                    }
+                } catch (NumberFormatException e) {
                     System.out.println("States can only be 0 or 1.");
-                    System.exit(-1);
+                    continue mainLoop;
                 }
-            } catch (NumberFormatException e) {
+            }
+
+            // Perform a trace of the network.
+            System.out.print("Tracing network...");
+            Trace trace = null;
+            try {
+                trace = network.trace(startingState);
+            } catch (NetworkTraceException e) {
                 System.out.println(e.getMessage());
                 System.exit(-1);
             }
+
+            System.out.println("Network traced.\n");
+
+            // Display the network trace and attractor.
+            System.out.printf("Trace: %s\n", trace);
+            System.out.printf("Attractor: %s\n", trace.attractor);
         }
-
-        // Perform a trace of the network.
-        System.out.print("Tracing network...");
-        Trace trace = null;
-        try {
-            trace = network.trace(startingState);
-        } catch (NetworkTraceException e) {
-            System.out.println(e.getMessage());
-            System.exit(-1);
-        }
-
-        System.out.println("Network traced.\n");
-
-        // Display the network trace and attractor.
-        System.out.printf("Trace: %s\n", trace);
-        System.out.printf("Attractor: %s\n", trace.attractor);
 
         System.out.println("\nDone.");
     }
