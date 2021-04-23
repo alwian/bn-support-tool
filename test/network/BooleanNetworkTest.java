@@ -1,9 +1,7 @@
-import network.BooleanNetwork;
-import network.NetworkTraceException;
-import network.State;
-import network.Trace;
+package network;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.fail;
 
 public class BooleanNetworkTest {
     @org.junit.Test
