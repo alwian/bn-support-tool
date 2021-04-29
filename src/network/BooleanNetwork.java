@@ -14,23 +14,12 @@ import java.util.*;
 public class BooleanNetwork {
 
     /**
-     * The nodes which make up the network.
-     */
-    private final List<Node> nodes = new ArrayList<>();
-
-    /**
-     * Getter for nodes.
-     *
-     * @return The nodes of the network.
-     */
-    public List<Node> getNodes() {
-        return nodes;
-    }
-
-    /**
      * The transitions from each global state to the next.
      */
-    private final StateTransitions transitions;
+    private final Map<int[], int[]> transitions = new HashMap<>();
+
+    private final Map<String, Integer> nodeIndexes = new HashMap<>();
+
 
     /**
      * Constructor for BooleanNetwork.
@@ -40,90 +29,90 @@ public class BooleanNetwork {
      * @throws NetworkCreationException When there is an error in a files syntax.
      */
     public BooleanNetwork(final String[] paths) throws IOException, NetworkCreationException {
-        transitions = new StateTransitions(paths.length);
+        int highestBinaryVal = (int) Math.pow(2, paths.length);
+        for (int x = 0; x < highestBinaryVal; x++) {
+            String[] strStates = String.format("%" + paths.length + "s", Integer.toBinaryString(x)).replace(" ", "0").split("");
+            int[] intStates = new int[strStates.length];
+            for (int y = 0; y < strStates.length; y++) {
+                intStates[y] = Integer.parseInt(strStates[y]);
+            }
+            transitions.put(intStates, intStates.clone());
+        }
+
         for (String path : paths) {
             int extensionStart = path.lastIndexOf(".");
             String extension = path.substring(extensionStart + 1).toUpperCase();
 
             // Make sure the file is a CSV.
             if (extension.equals("CSV")) {
-                transitions.addNode(path);
+                addNode(path);
             } else {
                 String fileName = new File(path).getName();
                 throw new NetworkCreationException(String.format("%s is not a CSV.",fileName));
             }
         }
-
-        for (int[] key : transitions.transitions.keySet()) {
-            System.out.println(Arrays.toString(key) + " -> " + Arrays.toString(transitions.transitions.get(key)));
-        }
     }
 
+    private void addNode(String path) throws IOException, NetworkCreationException {
+        BufferedReader reader = new BufferedReader(new FileReader(path));
+        String line;
+        List<List<String>> lines = new ArrayList<>();
 
-    /**
-     * Creates a network from a CSV file.
-     *
-     * @param path The path to the file storing the network transitions.
-     * @throws IOException When reading the file at path fails.
-     * @throws NetworkCreationException When there is an error in the file syntax.
-     */
-//    private void createFromCSV(final String path) throws IOException, NetworkCreationException {
-//        BufferedReader reader = new BufferedReader(new FileReader(path));
-//        String line;
-//        List<List<String>> lines = new ArrayList<>();
-//
-//        // Read the file line by line.
-//        while ((line = reader.readLine()) != null) {
-//            lines.add(Arrays.asList(line.split(",")));
-//        }
-//
-//        // Extract the headings from the file.
-//        List<String> headings = lines.remove(0);
-//
-//        // Check that there is 2 of each heading, in the same order.
-//        if (headings.size() % 2 != 0) {
-//            throw new NetworkCreationException("There must be 2 headings per node, example - [g1,g2,g3,g1,g2,g3].");
-//        } else if (!headings.subList(0, headings.size() / 2).equals(headings.subList(headings.size() / 2, headings.size()))) {
-//            throw new NetworkCreationException("Headings must be in the same order for before and after, example - [g1,g2,g3,g1,g2,g3].");
-//        }
-//
-//        // Check headings are correct.
-//        Map<String, Integer> headingCounts = new HashMap<>();
-//        for (String heading : headings) {
-//            headingCounts.compute(heading, (key, value) -> value == null ? 1 : value + 1);
-//        }
-//
-//        // Create the nodes of the network.
-//        for (int x = 0; x < headings.size() / 2; x++) {
-//            nodes.add(new Node(x, headings.get(x)));
-//        }
-//
-//        // Go through each state transition.
-//        for (List<String> t : lines) {
-//            // Check all values are present.
-//            if (t.size() != headings.size()) {
-//                throw new NetworkCreationException("There are missing state values.");
-//            }
-//
-//            int[] states = new int[headings.size()];
-//
-//            // Turn states into integers.
-//            for (int x = 0; x < t.size(); x++) {
-//                try {
-//                    states[x] = Integer.parseInt(t.get(x));
-//                } catch (NumberFormatException e) {
-//                    throw new NetworkCreationException("States can only be 1 or 0.");
-//                }
-//            }
-//
-//            int[] from = Arrays.copyOfRange(states, 0, nodes.size());
-//            int[] to = Arrays.copyOfRange(states, nodes.size(), states.length);
-//
-//            // Store state transitions as map.
-//            transitions.put(new State(from), new State(to));
-//        }
-//    }
-//
+        // Read the file line by line.
+        while ((line = reader.readLine()) != null) {
+            lines.add(Arrays.asList(line.split(",")));
+        }
+
+        // Extract the headings from the file.
+        List<String> headings = lines.remove(0);
+
+        String nodeName = headings.get(headings.size() - 1);
+        if (!nodeIndexes.containsKey(nodeName)) {
+            nodeIndexes.put(nodeName, nodeIndexes.size());
+        }
+
+        for (List<String> l : lines) {
+            int result;
+            Map<String, Integer> determinants = new HashMap<>();
+            try {
+                for (int x = 0; x < l.size() - 1; x++) {
+                    determinants.put(headings.get(x), Integer.parseInt(l.get(x)));
+                }
+                result = Integer.parseInt(l.get(l.size() - 1));
+                if (result != 0 && result != 1) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                throw new NetworkCreationException("Node states must be 0 or 1.");
+            }
+
+            for (int[] startingState : transitions.keySet()) {
+                boolean allDeterminantsMatch = true;
+                for (String determinant : determinants.keySet()) {
+                    if (!nodeIndexes.containsKey(determinant)) {
+                        nodeIndexes.put(determinant, nodeIndexes.size());
+                    }
+
+                    try {
+                        if (!(startingState[nodeIndexes.get(determinant)] == determinants.get(determinant))) {
+                            allDeterminantsMatch = false;
+                            break;
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        throw new NetworkCreationException("Too many nodes found in truth tables.");
+                    }
+                }
+
+                if (allDeterminantsMatch) {
+                    int[] finalState = transitions.get(startingState);
+                    finalState[nodeIndexes.get(nodeName)] = result;
+                    transitions.replace(startingState, finalState);
+                }
+            }
+        }
+
+    }
+
 //    /**
 //     * Creates a trace of the network.
 //     *
