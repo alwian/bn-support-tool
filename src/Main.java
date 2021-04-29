@@ -52,7 +52,16 @@ public class Main {
             }
         }
 
-        System.out.println(Arrays.toString(paths));
+        System.out.print("Creating network...");
+        try {
+            BooleanNetwork network = new BooleanNetwork(paths);
+        } catch (IOException | NetworkCreationException e) {
+            System.out.println("\n\n" + e.getMessage());
+            System.out.println("\nTerminated.");
+            System.exit(-1);
+        }
+        System.out.println("Network Created.");
+
 
 //        // Get user to choose the network file.
 //        System.out.print("Selecting file...");
