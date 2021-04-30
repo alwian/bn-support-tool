@@ -1,4 +1,5 @@
 import network.*;
+import util.Util;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -77,21 +78,15 @@ public class Main {
                     writer = new FileWriter(outputFile);
                     writer.write("Node Order: " + Arrays.toString(network.nodes) + "\n\n");
 
-                    int highestBinaryVal = (int) Math.pow(2, paths.length);
-                    for (int x = 0; x < highestBinaryVal; x++) {
-                        String[] strStates = String.format("%" + paths.length + "s", Integer.toBinaryString(x)).replace(" ", "0").split("");
-                        int[] intStates = new int[strStates.length];
-                        for (int y = 0; y < strStates.length; y++) {
-                            intStates[y] = Integer.parseInt(strStates[y]);
-                        }
+                    for (int[] state : Util.getStartingStates(paths.length)) {
+                        Trace trace = network.trace(state);
 
-                        Trace trace = network.trace(intStates);
-
-                        writer.append("Starting State: ").append(Arrays.toString(intStates)).append("\n");
+                        writer.append("Starting State: ").append(Arrays.toString(state)).append("\n");
                         writer.append("Trace: ").append(String.valueOf(trace.trace)).append("\n");
                         writer.append("Attractor: ").append(String.valueOf(trace.attractor)).append("\n\n");
                         writer.flush();
                     }
+
                     break;
                 } catch (IOException | NetworkTraceException e ) {
                     System.out.println("There was an error.\n\nTerminated.");

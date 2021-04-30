@@ -1,5 +1,7 @@
 package network;
 
+import util.Util;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -30,14 +32,8 @@ public class BooleanNetwork {
      * @throws NetworkCreationException When there is an error in a files syntax.
      */
     public BooleanNetwork(final String[] paths) throws IOException, NetworkCreationException {
-        int highestBinaryVal = (int) Math.pow(2, paths.length);
-        for (int x = 0; x < highestBinaryVal; x++) {
-            String[] strStates = String.format("%" + paths.length + "s", Integer.toBinaryString(x)).replace(" ", "0").split("");
-            int[] intStates = new int[strStates.length];
-            for (int y = 0; y < strStates.length; y++) {
-                intStates[y] = Integer.parseInt(strStates[y]);
-            }
-            transitions.put(new State(intStates), new State(intStates.clone()));
+        for (int[] state : Util.getStartingStates(paths.length)) {
+            transitions.put(new State(state), new State(state.clone()));
         }
 
         for (String path : paths) {
