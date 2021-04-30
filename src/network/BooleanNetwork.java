@@ -1,7 +1,5 @@
 package network;
 
-import sun.text.resources.CollationData;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,7 +16,7 @@ public class BooleanNetwork {
     /**
      * The transitions from each global state to the next.
      */
-    private Map<int[], int[]> transitions = new HashMap<>();
+    private Map<State, State> transitions = new HashMap<>();
 
     private final Map<String, Integer> nodeIndexes = new HashMap<>();
 
@@ -38,7 +36,7 @@ public class BooleanNetwork {
             for (int y = 0; y < strStates.length; y++) {
                 intStates[y] = Integer.parseInt(strStates[y]);
             }
-            transitions.put(intStates, intStates.clone());
+            transitions.put(new State(intStates), new State(intStates.clone()));
         }
 
         for (String path : paths) {
@@ -55,10 +53,6 @@ public class BooleanNetwork {
         }
 
         reorder();
-
-        for (int[] key : transitions.keySet()) {
-            System.out.println(Arrays.toString(key) + " -> " + Arrays.toString(transitions.get(key)));
-        }
     }
 
     private void addNode(String path) throws IOException, NetworkCreationException {
@@ -94,7 +88,7 @@ public class BooleanNetwork {
                 throw new NetworkCreationException("Node states must be 0 or 1.");
             }
 
-            for (int[] startingState : transitions.keySet()) {
+            for (State startingState : transitions.keySet()) {
                 boolean allDeterminantsMatch = true;
                 for (String determinant : determinants.keySet()) {
                     if (!nodeIndexes.containsKey(determinant)) {
@@ -102,7 +96,7 @@ public class BooleanNetwork {
                     }
 
                     try {
-                        if (!(startingState[nodeIndexes.get(determinant)] == determinants.get(determinant))) {
+                        if (!(startingState.nodeStates[nodeIndexes.get(determinant)] == determinants.get(determinant))) {
                             allDeterminantsMatch = false;
                             break;
                         }
@@ -112,30 +106,29 @@ public class BooleanNetwork {
                 }
 
                 if (allDeterminantsMatch) {
-                    int[] finalState = transitions.get(startingState);
-                    finalState[nodeIndexes.get(nodeName)] = result;
+                    State finalState = transitions.get(startingState);
+                    finalState.nodeStates[nodeIndexes.get(nodeName)] = result;
                 }
             }
         }
     }
 
     private void reorder() {
-        System.out.println(nodeIndexes);
-        Map<int[], int[]> orderedTransitions = new HashMap<>();
+        Map<State, State> orderedTransitions = new HashMap<>();
         String[] orderedNodes = nodeIndexes.keySet().toArray(new String[0]);
         Arrays.sort(nodeIndexes.keySet().toArray());
 
-        for (int[] unorderedStart : transitions.keySet()) {
+        for (State unorderedStart : transitions.keySet()) {
             int[] orderedStart = new int[nodeIndexes.size()];
             int[] orderedEnd = new int[nodeIndexes.size()];
 
-            int[] unorderedEnd = transitions.get(unorderedStart);
+            int[] unorderedEnd = transitions.get(unorderedStart).nodeStates;
 
             for (int x = 0; x < orderedNodes.length; x++) {
-                orderedStart[x] = unorderedStart[nodeIndexes.get(orderedNodes[x])];
+                orderedStart[x] = unorderedStart.nodeStates[nodeIndexes.get(orderedNodes[x])];
                 orderedEnd[x] = unorderedEnd[nodeIndexes.get(orderedNodes[x])];
 
-                orderedTransitions.put(orderedStart, orderedEnd);
+                orderedTransitions.put(new State(orderedStart), new State(orderedEnd));
             }
         }
 
@@ -146,36 +139,37 @@ public class BooleanNetwork {
         transitions = orderedTransitions;
     }
 
-//    /**
-//     * Creates a trace of the network.
-//     *
-//     * @param startingState Initial state of the network.
-//     * @return A trace object containing the trace.
-//     * @throws NetworkTraceException When the starting state is invalid.
-//     */
-//    public Trace trace(final int[] startingState) throws NetworkTraceException {
-//        // Check the star state is valid.
-//        if (startingState.length != nodes.size()) {
-//            throw new NetworkTraceException(String.format("You must provide %d starting states.", nodes.size()));
-//        }
-//
-//        State currentState = new State(startingState);
-//        List<State> trace = new ArrayList<>();
-//        trace.add(currentState);
-//        State newState;
-//
-//        // Trace until an attractor is found.
-//        while (true) {
-//            newState = transitions.get(currentState);
-//
-//            // Check if state has been seen before.
-//            if (trace.contains(newState)) {
-//                trace.add(newState);
-//                break;
-//            }
-//            trace.add(newState);
-//            currentState = newState;
-//        }
-//        return new Trace(startingState, trace);
-//    }
+    /**
+     * Creates a trace of the network.
+     *
+     * @param startingState Initial state of the network.
+     * @return A trace object containing the trace.
+     * @throws NetworkTraceException When the starting state is invalid.
+     */
+    public Trace trace(final int[] startingState) throws NetworkTraceException {
+        // Check the start state is valid.
+        if (startingState.length != nodeIndexes.size()) {
+            throw new NetworkTraceException(String.format("You must provide %d starting states.", nodeIndexes.size()));
+        }
+
+        State currentState = new State(startingState);
+        List<State> trace = new ArrayList<>();
+        trace.add(currentState);
+        State newState;
+
+        // Trace until an attractor is found.
+        while (true) {
+            newState = transitions.get(currentState);
+
+            // Check if state has been seen before.
+            if (trace.contains(newState)) {
+                trace.add(newState);
+                break;
+            }
+
+            trace.add(newState);
+            currentState = newState;
+        }
+        return new Trace(startingState, trace);
+    }
 }
