@@ -1,5 +1,7 @@
 package network;
 
+import sun.text.resources.CollationData;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -16,7 +18,7 @@ public class BooleanNetwork {
     /**
      * The transitions from each global state to the next.
      */
-    private final Map<int[], int[]> transitions = new HashMap<>();
+    private Map<int[], int[]> transitions = new HashMap<>();
 
     private final Map<String, Integer> nodeIndexes = new HashMap<>();
 
@@ -50,6 +52,12 @@ public class BooleanNetwork {
                 String fileName = new File(path).getName();
                 throw new NetworkCreationException(String.format("%s is not a CSV.",fileName));
             }
+        }
+
+        reorder();
+
+        for (int[] key : transitions.keySet()) {
+            System.out.println(Arrays.toString(key) + " -> " + Arrays.toString(transitions.get(key)));
         }
     }
 
@@ -106,11 +114,36 @@ public class BooleanNetwork {
                 if (allDeterminantsMatch) {
                     int[] finalState = transitions.get(startingState);
                     finalState[nodeIndexes.get(nodeName)] = result;
-                    transitions.replace(startingState, finalState);
                 }
             }
         }
+    }
 
+    private void reorder() {
+        System.out.println(nodeIndexes);
+        Map<int[], int[]> orderedTransitions = new HashMap<>();
+        String[] orderedNodes = nodeIndexes.keySet().toArray(new String[0]);
+        Arrays.sort(nodeIndexes.keySet().toArray());
+
+        for (int[] unorderedStart : transitions.keySet()) {
+            int[] orderedStart = new int[nodeIndexes.size()];
+            int[] orderedEnd = new int[nodeIndexes.size()];
+
+            int[] unorderedEnd = transitions.get(unorderedStart);
+
+            for (int x = 0; x < orderedNodes.length; x++) {
+                orderedStart[x] = unorderedStart[nodeIndexes.get(orderedNodes[x])];
+                orderedEnd[x] = unorderedEnd[nodeIndexes.get(orderedNodes[x])];
+
+                orderedTransitions.put(orderedStart, orderedEnd);
+            }
+        }
+
+        for (int x = 0; x < orderedNodes.length; x++) {
+            nodeIndexes.replace(orderedNodes[x], x);
+        }
+
+        transitions = orderedTransitions;
     }
 
 //    /**
