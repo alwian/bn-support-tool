@@ -20,6 +20,7 @@ public class BooleanNetwork {
 
     private final Map<String, Integer> nodeIndexes = new HashMap<>();
 
+    public String[] nodes;
 
     /**
      * Constructor for BooleanNetwork.
@@ -117,6 +118,8 @@ public class BooleanNetwork {
         Map<State, State> orderedTransitions = new HashMap<>();
         String[] orderedNodes = nodeIndexes.keySet().toArray(new String[0]);
         Arrays.sort(nodeIndexes.keySet().toArray());
+
+        nodes = orderedNodes;
 
         for (State unorderedStart : transitions.keySet()) {
             int[] orderedStart = new int[nodeIndexes.size()];
