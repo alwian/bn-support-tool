@@ -127,8 +127,9 @@ public class BooleanNetwork {
                 orderedStart[x] = unorderedStart.nodeStates[nodeIndexes.get(orderedNodes[x])];
                 orderedEnd[x] = unorderedEnd[nodeIndexes.get(orderedNodes[x])];
 
-                orderedTransitions.put(new State(orderedStart), new State(orderedEnd));
+
             }
+            orderedTransitions.put(new State(orderedStart), new State(orderedEnd));
         }
 
         for (int x = 0; x < orderedNodes.length; x++) {
