@@ -1,11 +1,12 @@
-import network.BooleanNetwork;
-import network.NetworkCreationException;
-import network.NetworkTraceException;
-import network.Trace;
+import network.*;
+import util.Util;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -21,7 +22,7 @@ public class Main {
      *
      * @param args Command line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // File chooser setup.
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -29,48 +30,82 @@ public class Main {
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("csv", "csv"));
 
-        // Get user to choose the network file.
-        System.out.print("Selecting file...");
-        String selectedFile = null;
-        while (selectedFile == null) {
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                selectedFile = fileChooser.getSelectedFile().toString();
-                System.out.println("File Selected.");
-            } else {
-                System.out.println("No file selected, please run again.");
-                System.exit(0);
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter number of nodes: ");
+        int numOfNodes = scanner.nextInt();
+        String[] paths = new String[numOfNodes];
+
+
+        for (int x = 0; x < numOfNodes; x++) {
+            String selectedFile = null;
+            System.out.printf("Selecting file for node %d...", x + 1);
+            while (selectedFile == null) {
+                int returnValue = fileChooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    selectedFile = fileChooser.getSelectedFile().toString();
+                    System.out.println("File Selected");
+                    paths[x] = selectedFile;
+                } else {
+                    System.out.println("No file selected, please try again.");
+                }
             }
         }
 
-        // Create a network using the file.
         BooleanNetwork network = null;
+        System.out.print("Creating network...");
         try {
-            System.out.print("Creating network...");
-            network = new BooleanNetwork(selectedFile);
-            System.out.println("Network created.");
+            network = new BooleanNetwork(paths);
         } catch (IOException | NetworkCreationException e) {
-            System.out.println(e.getMessage());
+            System.out.println("\n\n" + e.getMessage());
+            System.out.println("\nTerminated.");
             System.exit(-1);
         }
+        System.out.println("Network Created.");
 
-        // Get the desired startig state.
-        int nodeCount = network.getNodes().size();
-
-        String[] startingStateStrings = null;
+        scanner = new Scanner(System.in);
 
         mainLoop:
         while (true) {
-            System.out.printf("\nEnter starting state (as %d consecutive integers): ", nodeCount);
-            Scanner scanner = new Scanner(System.in);
-            startingStateStrings = scanner.nextLine().split("");
+            System.out.printf("\nEnter starting state (as %d consecutive integers): ", numOfNodes);
+            String startingStateStr = scanner.nextLine();
+
+            // Trace all starting states and output the results to a file.
+            if (startingStateStr.equalsIgnoreCase("all")) {
+                File outputFile = new File("output.txt");
+                FileWriter writer;
+                try {
+                    outputFile.createNewFile();
+                    writer = new FileWriter(outputFile);
+                    // Write the node order of states.
+                    writer.write("Node Order: " + Arrays.toString(network.getNodes()) + "\n\n");
+
+                    // For all starting states trace the network.
+                    for (int[] state : Util.getStartingStates(paths.length)) {
+                        Trace trace = network.trace(state);
+
+                        // Write the starting state, trace and attractor.
+                        writer.append("Starting State: ").append(Arrays.toString(state)).append("\n");
+                        writer.append("Trace: ").append(String.valueOf(trace.getTrace())).append("\n");
+                        writer.append("Attractor: ").append(String.valueOf(trace.attractor)).append("\n\n");
+                        writer.flush();
+                    }
+
+                    // Exit the program once file writing is complete.
+                    break;
+                } catch (IOException | NetworkTraceException e) {
+                    System.out.println("There was an error.\n\nTerminated.");
+                    System.exit(-1);
+                }
+            }
+
+            String[] startingStateStrings = startingStateStr.split("");
 
             if (startingStateStrings.length == 1 && startingStateStrings[0].trim().equals("")) {
                 break;
             }
 
             // Make sure the starting state was the right length.
-            if (startingStateStrings.length != nodeCount) {
+            if (startingStateStrings.length != numOfNodes) {
                 System.out.println("Wrong number of node states entered.");
                 continue;
             }
@@ -108,4 +143,5 @@ public class Main {
 
         System.out.println("\nDone.");
     }
+
 }
