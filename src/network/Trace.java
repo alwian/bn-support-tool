@@ -8,17 +8,17 @@ import java.util.List;
  *
  * @author Alex Anderson
  */
-public class Trace {
+public final class Trace {
 
     /**
      * The starting state of the network.
      */
-    public int[] startingState;
+    private final int[] startingState;
 
     /**
      * The trace created from the starting state.
      */
-    public List<State> trace;
+    private List<State> trace;
 
     /**
      * The attractor for the given trace.
@@ -26,12 +26,21 @@ public class Trace {
     public List<State> attractor;
 
     /**
+     * Accessor for trace.
+     *
+     * @return trace
+     */
+    public List<State> getTrace() {
+        return trace;
+    }
+
+    /**
      * Constructor for a network trace.
      *
      * @param trace The trace for the given starting state.
      */
-    public Trace(List<State> trace) {
-        this.startingState = trace.get(0).nodeStates;
+    public Trace(final List<State> trace) {
+        this.startingState = trace.get(0).getNodeStates();
         this.trace = trace;
         this.attractor = findAttractor();
     }

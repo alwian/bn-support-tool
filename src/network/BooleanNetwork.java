@@ -20,9 +20,24 @@ public class BooleanNetwork {
      */
     private Map<State, State> transitions = new HashMap<>();
 
+    /**
+     * Which indexes in a state represent which node.
+     */
     private final Map<String, Integer> nodeIndexes = new HashMap<>();
 
-    public String[] nodes;
+    /**
+     * The nodes making up the network.
+     */
+    private String[] nodes;
+
+    /**
+     * Accessor for nodes.
+     *
+     * @return nodes
+     */
+    public String[] getNodes() {
+        return nodes;
+    }
 
     /**
      * Constructor for BooleanNetwork.
@@ -32,6 +47,7 @@ public class BooleanNetwork {
      * @throws NetworkCreationException When there is an error in a files syntax.
      */
     public BooleanNetwork(final String[] paths) throws IOException, NetworkCreationException {
+        // Create a default transition map.
         for (int[] state : Util.getStartingStates(paths.length)) {
             transitions.put(new State(state), new State(state.clone()));
         }
@@ -45,14 +61,22 @@ public class BooleanNetwork {
                 addNode(path);
             } else {
                 String fileName = new File(path).getName();
-                throw new NetworkCreationException(String.format("%s is not a CSV.",fileName));
+                throw new NetworkCreationException(String.format("%s is not a CSV.", fileName));
             }
         }
 
         reorder();
     }
 
-    private void addNode(String path) throws IOException, NetworkCreationException {
+    /**
+     * Takes in a truth table for a node and
+     * updates the transition map to reflect the truth table.
+     *
+     * @param path Path to the truth table.
+     * @throws IOException When an error occurs reading the file at path.
+     * @throws NetworkCreationException When there is an error in the truth table syntax.
+     */
+    private void addNode(final String path) throws IOException, NetworkCreationException {
         BufferedReader reader = new BufferedReader(new FileReader(path));
         String line;
         List<List<String>> lines = new ArrayList<>();
@@ -70,13 +94,17 @@ public class BooleanNetwork {
             nodeIndexes.put(nodeName, nodeIndexes.size());
         }
 
+        // Go through each entry in the truth table.
         for (List<String> l : lines) {
             int result;
             Map<String, Integer> determinants = new HashMap<>();
             try {
+                // Get the determinant nodes.
                 for (int x = 0; x < l.size() - 1; x++) {
                     determinants.put(headings.get(x), Integer.parseInt(l.get(x)));
                 }
+
+                // Get the node the truth table is for.
                 result = Integer.parseInt(l.get(l.size() - 1));
                 if (result != 0 && result != 1) {
                     throw new NumberFormatException();
@@ -85,15 +113,20 @@ public class BooleanNetwork {
                 throw new NetworkCreationException("Node states must be 0 or 1.");
             }
 
+            // Update the transition map based on the current truth table.
             for (State startingState : transitions.keySet()) {
                 boolean allDeterminantsMatch = true;
+
+                // Go through all determinants.
                 for (String determinant : determinants.keySet()) {
+                    // If a new node is found as a determinant, assign it an index.
                     if (!nodeIndexes.containsKey(determinant)) {
                         nodeIndexes.put(determinant, nodeIndexes.size());
                     }
 
+                    // Check if the current determinant matches the current starting state.
                     try {
-                        if (!(startingState.nodeStates[nodeIndexes.get(determinant)] == determinants.get(determinant))) {
+                        if (!(startingState.getNodeStates()[nodeIndexes.get(determinant)] == determinants.get(determinant))) {
                             allDeterminantsMatch = false;
                             break;
                         }
@@ -102,40 +135,53 @@ public class BooleanNetwork {
                     }
                 }
 
+                // If all determinants match the current starting state, update the resulting state.
                 if (allDeterminantsMatch) {
                     State finalState = transitions.get(startingState);
-                    finalState.nodeStates[nodeIndexes.get(nodeName)] = result;
+                    finalState.getNodeStates()[nodeIndexes.get(nodeName)] = result;
                 }
             }
         }
     }
 
+    /**
+     * Reorders the states in the transition map to reflect the
+     * nodes of the network being in alphabetical order.
+     */
     private void reorder() {
+        // New map for the ordered transitions.
         Map<State, State> orderedTransitions = new HashMap<>();
+
+        // Order the nodes alphabetically.
         String[] orderedNodes = nodeIndexes.keySet().toArray(new String[0]);
         Arrays.sort(nodeIndexes.keySet().toArray());
 
         nodes = orderedNodes;
 
+        // Go through the unordered starting states.
         for (State unorderedStart : transitions.keySet()) {
+            // New arrays to store the ordered states.
             int[] orderedStart = new int[nodeIndexes.size()];
             int[] orderedEnd = new int[nodeIndexes.size()];
 
-            int[] unorderedEnd = transitions.get(unorderedStart).nodeStates;
+            int[] unorderedEnd = transitions.get(unorderedStart).getNodeStates();
 
+            // Go through each node and put it's corresponding value in the correct place.
             for (int x = 0; x < orderedNodes.length; x++) {
-                orderedStart[x] = unorderedStart.nodeStates[nodeIndexes.get(orderedNodes[x])];
+                orderedStart[x] = unorderedStart.getNodeStates()[nodeIndexes.get(orderedNodes[x])];
                 orderedEnd[x] = unorderedEnd[nodeIndexes.get(orderedNodes[x])];
-
-
             }
+
+            // Store the ordered transition in the new map.
             orderedTransitions.put(new State(orderedStart), new State(orderedEnd));
         }
 
+        // Update the node indexes to reflect the new positions.
         for (int x = 0; x < orderedNodes.length; x++) {
             nodeIndexes.replace(orderedNodes[x], x);
         }
 
+        // Replace the old transition map.
         transitions = orderedTransitions;
     }
 

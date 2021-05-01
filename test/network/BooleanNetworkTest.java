@@ -50,7 +50,7 @@ public class BooleanNetworkTest {
             } catch (NetworkTraceException e) {
                 fail(e.getMessage());
             }
-            assertArrayEquals(expectedTraces.get(x), t.trace.toArray());
+            assertArrayEquals(expectedTraces.get(x), t.getTrace().toArray());
         }
     }
 
@@ -97,7 +97,7 @@ public class BooleanNetworkTest {
             } catch (NetworkTraceException e) {
                 fail(e.getMessage());
             }
-            assertArrayEquals(expectedTraces.get(x), t.trace.toArray());
+            assertArrayEquals(expectedTraces.get(x), t.getTrace().toArray());
         }
     }
 
@@ -145,7 +145,7 @@ public class BooleanNetworkTest {
             } catch (NetworkTraceException e) {
                 fail(e.getMessage());
             }
-            assertArrayEquals(expectedTraces.get(x), t.trace.toArray());
+            assertArrayEquals(expectedTraces.get(x), t.getTrace().toArray());
         }
     }
 
@@ -191,7 +191,7 @@ public class BooleanNetworkTest {
             } catch (NetworkTraceException e) {
                 fail(e.getMessage());
             }
-            assertArrayEquals(expectedTraces.get(x), t.trace.toArray());
+            assertArrayEquals(expectedTraces.get(x), t.getTrace().toArray());
         }
     }
 
@@ -238,7 +238,7 @@ public class BooleanNetworkTest {
             } catch (NetworkTraceException e) {
                 fail(e.getMessage());
             }
-            assertArrayEquals(expectedTraces.get(x), t.trace.toArray());
+            assertArrayEquals(expectedTraces.get(x), t.getTrace().toArray());
         }
     }
 }

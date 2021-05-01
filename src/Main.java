@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -23,7 +22,7 @@ public class Main {
      *
      * @param args Command line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // File chooser setup.
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -70,25 +69,30 @@ public class Main {
             System.out.printf("\nEnter starting state (as %d consecutive integers): ", numOfNodes);
             String startingStateStr = scanner.nextLine();
 
+            // Trace all starting states and output the results to a file.
             if (startingStateStr.equalsIgnoreCase("all")) {
                 File outputFile = new File("output.txt");
                 FileWriter writer;
                 try {
                     outputFile.createNewFile();
                     writer = new FileWriter(outputFile);
-                    writer.write("Node Order: " + Arrays.toString(network.nodes) + "\n\n");
+                    // Write the node order of states.
+                    writer.write("Node Order: " + Arrays.toString(network.getNodes()) + "\n\n");
 
+                    // For all starting states trace the network.
                     for (int[] state : Util.getStartingStates(paths.length)) {
                         Trace trace = network.trace(state);
 
+                        // Write the starting state, trace and attractor.
                         writer.append("Starting State: ").append(Arrays.toString(state)).append("\n");
-                        writer.append("Trace: ").append(String.valueOf(trace.trace)).append("\n");
+                        writer.append("Trace: ").append(String.valueOf(trace.getTrace())).append("\n");
                         writer.append("Attractor: ").append(String.valueOf(trace.attractor)).append("\n\n");
                         writer.flush();
                     }
 
+                    // Exit the program once file writing is complete.
                     break;
-                } catch (IOException | NetworkTraceException e ) {
+                } catch (IOException | NetworkTraceException e) {
                     System.out.println("There was an error.\n\nTerminated.");
                     System.exit(-1);
                 }
