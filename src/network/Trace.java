@@ -28,11 +28,10 @@ public class Trace {
     /**
      * Constructor for a network trace.
      *
-     * @param startingState The state the network started in.
      * @param trace The trace for the given starting state.
      */
-    public Trace(int[] startingState, List<State> trace) {
-        this.startingState = startingState;
+    public Trace(List<State> trace) {
+        this.startingState = trace.get(0).nodeStates;
         this.trace = trace;
         this.attractor = findAttractor();
     }

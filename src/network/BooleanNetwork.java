@@ -170,6 +170,6 @@ public class BooleanNetwork {
             trace.add(newState);
             currentState = newState;
         }
-        return new Trace(startingState, trace);
+        return new Trace(trace);
     }
 }
