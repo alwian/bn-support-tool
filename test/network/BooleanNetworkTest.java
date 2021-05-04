@@ -10,15 +10,11 @@ import static org.junit.Assert.fail;
 public class BooleanNetworkTest {
     @org.junit.Test
     public void network1Traces() {
-        String[] paths = new String[] {
-          "test_files/test_case_1/g1.csv",
-                "test_files/test_case_1/g2.csv",
-                "test_files/test_case_1/g3.csv",
-        };
+        String path = "test_files/test_case_1.csv";
 
         BooleanNetwork network = null;
         try {
-            network = new BooleanNetwork(paths);
+            network = new BooleanNetwork(path);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -56,16 +52,11 @@ public class BooleanNetworkTest {
 
     @org.junit.Test
     public void network2Traces() {
-        String[] paths = new String[] {
-                "test_files/test_case_2/g1.csv",
-                "test_files/test_case_2/g2.csv",
-                "test_files/test_case_2/g3.csv",
-                "test_files/test_case_2/g4.csv",
-        };
+        String path = "test_files/test_case_2.csv";
 
         BooleanNetwork network = null;
         try {
-            network = new BooleanNetwork(paths);
+            network = new BooleanNetwork(path);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -103,17 +94,11 @@ public class BooleanNetworkTest {
 
     @org.junit.Test
     public void network3Traces() {
-        String[] paths = new String[] {
-                "test_files/test_case_3/g1.csv",
-                "test_files/test_case_3/g2.csv",
-                "test_files/test_case_3/g3.csv",
-                "test_files/test_case_3/g4.csv",
-                "test_files/test_case_3/g5.csv"
-        };
+        String path = "test_files/test_case_3.csv";
 
         BooleanNetwork network = null;
         try {
-            network = new BooleanNetwork(paths);
+            network = new BooleanNetwork(path);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -151,15 +136,11 @@ public class BooleanNetworkTest {
 
     @org.junit.Test
     public void network4Traces() {
-        String[] paths = new String[] {
-                "test_files/test_case_4/g1.csv",
-                "test_files/test_case_4/g2.csv",
-                "test_files/test_case_4/g3.csv",
-        };
+        String path = "test_files/test_case_4.csv";
 
         BooleanNetwork network = null;
         try {
-            network = new BooleanNetwork(paths);
+            network = new BooleanNetwork(path);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -197,16 +178,11 @@ public class BooleanNetworkTest {
 
     @org.junit.Test
     public void network5Traces() {
-        String[] paths = new String[] {
-                "test_files/test_case_5/g1.csv",
-                "test_files/test_case_5/g2.csv",
-                "test_files/test_case_5/g3.csv",
-                "test_files/test_case_5/g4.csv"
-        };
+        String path = "test_files/test_case_5.csv";
 
         BooleanNetwork network = null;
         try {
-            network = new BooleanNetwork(paths);
+            network = new BooleanNetwork(path);
         } catch (Exception e) {
             fail(e.getMessage());
         }
