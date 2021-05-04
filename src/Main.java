@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -67,21 +68,58 @@ public class Main {
                 File outputFile = new File("output.txt");
                 FileWriter writer;
                 try {
+                    boolean appending = false;
+
                     outputFile.createNewFile();
                     writer = new FileWriter(outputFile);
+
+                    if (network.getTitle() != null) {
+                        writer.write(String.format("****** %s ******\n\n", network.getTitle()));
+                        appending = true;
+                    }
+
+                    if (network.getDescription() != null) {
+                        writer.write(network.getDescription());
+                        writer.write("\n");
+                        appending = true;
+                    }
+
                     // Write the node order of states.
-                    writer.write("Node Order: " + Arrays.toString(network.getNodes()) + "\n\n");
+                    if (appending) {
+                        writer.append("\nNode Order: ").append(Arrays.toString(network.getNodes())).append("\n\n");
+                    } else {
+                        writer.write("Node Order: " + Arrays.toString(network.getNodes()) + "\n\n");
+                    }
+
 
                     // For all starting states trace the network.
-                    for (int[] state : Util.getStartingStates(network.getNodes().length)) {
-                        Trace trace = network.trace(state);
+                    List<int[]> startingStates = Util.getStartingStates(network.getNodes().length);
+                    for (int[] startingState : startingStates) {
+                        List<State> trace = network.trace(startingState).getTrace();
 
-                        // Write the starting state, trace and attractor.
-                        writer.append("Starting State: ").append(Arrays.toString(state)).append("\n");
-                        writer.append("Trace: ").append(String.valueOf(trace.getTrace())).append("\n");
-                        writer.append("Attractor: ").append(String.valueOf(trace.attractor)).append("\n\n");
+                        writer.append(String.format("------ Trace for %s ------\n", Arrays.toString(startingState)));
+                        for (int y = 0; y < trace.size(); y++) {
+                            writer.append(trace.get(y).toString());
+                            if (trace.size() - y > 1) {
+                                writer.append(" -> ");
+                            }
+                        }
+                        writer.append("\n\n");
                         writer.flush();
                     }
+
+                    writer.append("\n------ Attractors ------\n");
+                    for (List<State> attractor : network.getAttractors()) {
+                        for (int y = 0; y < attractor.size(); y++) {
+                            writer.append(attractor.get(y).toString());
+                            if (attractor.size() - y > 1) {
+                                writer.append(" -> ");
+                            }
+                        }
+                        writer.append("\n");
+                    }
+                    writer.flush();
+                    writer.close();
 
                     // Exit the program once file writing is complete.
                     break;

@@ -15,7 +15,14 @@ import java.util.*;
  */
 public class BooleanNetwork {
 
+    /**
+     * Optional title for the network.
+     */
     private String title;
+
+    /**
+     * Optional description for the network.
+     */
     private String description;
 
     /**
@@ -23,6 +30,10 @@ public class BooleanNetwork {
      */
     private Map<State, State> transitions = new HashMap<>();
 
+    /**
+     * All of the attractors in the network.
+     */
+    private List<List<State>> attractors = new ArrayList<>();
 
     /**
      * Which indexes in a state represent which node.
@@ -33,6 +44,18 @@ public class BooleanNetwork {
      * The nodes making up the network.
      */
     private String[] nodes;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<List<State>> getAttractors() {
+        return attractors;
+    }
 
     /**
      * Accessor for nodes.
@@ -71,6 +94,7 @@ public class BooleanNetwork {
         }
 
         reorder();
+        getAllAttractors();
     }
 
     private List<List<List<String>>> deconstructFile(String path) throws IOException {
@@ -112,6 +136,27 @@ public class BooleanNetwork {
         }
 
         return tables;
+    }
+
+    private void getAllAttractors() throws NetworkTraceException {
+        for (State startingState : transitions.keySet()) {
+            List<State> attractor = trace(startingState.getNodeStates()).attractor;
+            boolean newAttractor = true;
+
+            for (List<State> attractor2 : attractors) {
+                List<State> tempAttractor = new ArrayList<>(attractor);
+                tempAttractor.retainAll(attractor2);
+
+                if (tempAttractor.size() > 0) {
+                    newAttractor = false;
+                    break;
+                }
+            }
+
+            if (newAttractor) {
+                attractors.add(attractor);
+            }
+        }
     }
 
     /**
