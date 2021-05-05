@@ -33,7 +33,7 @@ public class BooleanNetwork {
     /**
      * All of the attractors in the network.
      */
-    private List<List<State>> attractors = new ArrayList<>();
+    private final List<List<State>> attractors = new ArrayList<>();
 
     /**
      * Which indexes in a state represent which node.
@@ -45,14 +45,29 @@ public class BooleanNetwork {
      */
     private String[] nodes;
 
+    /**
+     * Accessor for title.
+     *
+     * @return title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Accessor for description.
+     *
+     * @return description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Gets all of the attractors in the network.
+     *
+     * @return All of the attractors in the network.
+     */
     public List<List<State>> getAttractors() {
         return attractors;
     }
@@ -97,7 +112,14 @@ public class BooleanNetwork {
         getAllAttractors();
     }
 
-    private List<List<List<String>>> deconstructFile(String path) throws IOException {
+    /**
+     * Splits up a network file into individual truth tables.
+     *
+     * @param path The path to the network file.
+     * @return List of truth tables.
+     * @throws IOException When an error occurs reading the file.
+     */
+    private List<List<List<String>>> deconstructFile(final String path) throws IOException {
         List<List<List<String>>> tables = new ArrayList<>();
 
         BufferedReader reader = new BufferedReader(new FileReader(path));
@@ -128,7 +150,7 @@ public class BooleanNetwork {
             List<String> headings = lines.remove(0);
             table.add(headings);
 
-            for (int x = 0; x < Math.pow(2,headings.size() - 1); x++) {
+            for (int x = 0; x < Math.pow(2, headings.size() - 1); x++) {
                 table.add(lines.remove(0));
             }
 
@@ -138,6 +160,11 @@ public class BooleanNetwork {
         return tables;
     }
 
+    /**
+     * Creates all possible traces.
+     *
+     * @throws NetworkTraceException When an error occurs performing a trace.
+     */
     private void getAllAttractors() throws NetworkTraceException {
         for (State startingState : transitions.keySet()) {
             List<State> attractor = trace(startingState.getNodeStates()).attractor;
