@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -30,43 +31,36 @@ public class Main {
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("csv", "csv"));
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter number of nodes: ");
-        int numOfNodes = scanner.nextInt();
-        String[] paths = new String[numOfNodes];
-
-
-        for (int x = 0; x < numOfNodes; x++) {
-            String selectedFile = null;
-            System.out.printf("Selecting file for node %d...", x + 1);
-            while (selectedFile == null) {
-                int returnValue = fileChooser.showOpenDialog(null);
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    selectedFile = fileChooser.getSelectedFile().toString();
-                    System.out.println("File Selected");
-                    paths[x] = selectedFile;
-                } else {
-                    System.out.println("No file selected, please try again.");
-                }
+        System.out.println("Selecting network file...");
+        String selectedFile = null;
+        while (selectedFile == null) {
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                selectedFile = fileChooser.getSelectedFile().toString();
+                System.out.println("File Selected");
+            } else {
+                System.out.println("No file selected, please try again.");
             }
         }
+
+
 
         BooleanNetwork network = null;
         System.out.print("Creating network...");
         try {
-            network = new BooleanNetwork(paths);
-        } catch (IOException | NetworkCreationException e) {
+            network = new BooleanNetwork(selectedFile);
+        } catch (IOException | NetworkCreationException | NetworkTraceException e) {
             System.out.println("\n\n" + e.getMessage());
             System.out.println("\nTerminated.");
             System.exit(-1);
         }
         System.out.println("Network Created.");
 
-        scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
 
         mainLoop:
         while (true) {
-            System.out.printf("\nEnter starting state (as %d consecutive integers): ", numOfNodes);
+            System.out.printf("\nEnter starting state (as %d consecutive integers): ", network.getNodes().length);
             String startingStateStr = scanner.nextLine();
 
             // Trace all starting states and output the results to a file.
@@ -74,21 +68,58 @@ public class Main {
                 File outputFile = new File("output.txt");
                 FileWriter writer;
                 try {
+                    boolean appending = false;
+
                     outputFile.createNewFile();
                     writer = new FileWriter(outputFile);
+
+                    if (network.getTitle() != null) {
+                        writer.write(String.format("****** %s ******\n\n", network.getTitle()));
+                        appending = true;
+                    }
+
+                    if (network.getDescription() != null) {
+                        writer.write(network.getDescription());
+                        writer.write("\n");
+                        appending = true;
+                    }
+
                     // Write the node order of states.
-                    writer.write("Node Order: " + Arrays.toString(network.getNodes()) + "\n\n");
+                    if (appending) {
+                        writer.append("\nNode Order: ").append(Arrays.toString(network.getNodes())).append("\n\n");
+                    } else {
+                        writer.write("Node Order: " + Arrays.toString(network.getNodes()) + "\n\n");
+                    }
+
 
                     // For all starting states trace the network.
-                    for (int[] state : Util.getStartingStates(paths.length)) {
-                        Trace trace = network.trace(state);
+                    List<int[]> startingStates = Util.getStartingStates(network.getNodes().length);
+                    for (int[] startingState : startingStates) {
+                        List<State> trace = network.trace(startingState).getTrace();
 
-                        // Write the starting state, trace and attractor.
-                        writer.append("Starting State: ").append(Arrays.toString(state)).append("\n");
-                        writer.append("Trace: ").append(String.valueOf(trace.getTrace())).append("\n");
-                        writer.append("Attractor: ").append(String.valueOf(trace.attractor)).append("\n\n");
+                        writer.append(String.format("------ Trace for %s ------\n", Arrays.toString(startingState)));
+                        for (int y = 0; y < trace.size(); y++) {
+                            writer.append(trace.get(y).toString());
+                            if (trace.size() - y > 1) {
+                                writer.append(" -> ");
+                            }
+                        }
+                        writer.append("\n\n");
                         writer.flush();
                     }
+
+                    writer.append("\n------ Attractors ------\n");
+                    for (List<State> attractor : network.getAttractors()) {
+                        for (int y = 0; y < attractor.size(); y++) {
+                            writer.append(attractor.get(y).toString());
+                            if (attractor.size() - y > 1) {
+                                writer.append(" -> ");
+                            }
+                        }
+                        writer.append("\n");
+                    }
+                    writer.flush();
+                    writer.close();
 
                     // Exit the program once file writing is complete.
                     break;
@@ -105,7 +136,7 @@ public class Main {
             }
 
             // Make sure the starting state was the right length.
-            if (startingStateStrings.length != numOfNodes) {
+            if (startingStateStrings.length != network.getNodes().length) {
                 System.out.println("Wrong number of node states entered.");
                 continue;
             }

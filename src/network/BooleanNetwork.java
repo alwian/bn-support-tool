@@ -16,9 +16,24 @@ import java.util.*;
 public class BooleanNetwork {
 
     /**
+     * Optional title for the network.
+     */
+    private String title;
+
+    /**
+     * Optional description for the network.
+     */
+    private String description;
+
+    /**
      * The transitions from each global state to the next.
      */
     private Map<State, State> transitions = new HashMap<>();
+
+    /**
+     * All of the attractors in the network.
+     */
+    private final List<List<State>> attractors = new ArrayList<>();
 
     /**
      * Which indexes in a state represent which node.
@@ -29,6 +44,33 @@ public class BooleanNetwork {
      * The nodes making up the network.
      */
     private String[] nodes;
+
+    /**
+     * Accessor for title.
+     *
+     * @return title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Accessor for description.
+     *
+     * @return description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Gets all of the attractors in the network.
+     *
+     * @return All of the attractors in the network.
+     */
+    public List<List<State>> getAttractors() {
+        return attractors;
+    }
 
     /**
      * Accessor for nodes.
@@ -42,41 +84,44 @@ public class BooleanNetwork {
     /**
      * Constructor for BooleanNetwork.
      *
-     * @param paths The paths to node truth tables.
+     * @param path The path to node truth tables.
      * @throws IOException When reading a file fails.
      * @throws NetworkCreationException When there is an error in a files syntax.
      */
-    public BooleanNetwork(final String[] paths) throws IOException, NetworkCreationException {
-        // Create a default transition map.
-        for (int[] state : Util.getStartingStates(paths.length)) {
+    public BooleanNetwork(final String path) throws IOException, NetworkCreationException, NetworkTraceException {
+        int extensionStart = path.lastIndexOf(".");
+        String extension = path.substring(extensionStart + 1).toUpperCase();
+
+        // Make sure the file is a CSV.
+        if (!extension.equals("CSV")) {
+            String fileName = new File(path).getName();
+            throw new NetworkCreationException(String.format("%s is not a CSV.", fileName));
+        }
+
+        List<List<List<String>>> tables = deconstructFile(path);
+
+        for (int[] state : Util.getStartingStates(tables.size())) {
             transitions.put(new State(state), new State(state.clone()));
         }
 
-        for (String path : paths) {
-            int extensionStart = path.lastIndexOf(".");
-            String extension = path.substring(extensionStart + 1).toUpperCase();
-
-            // Make sure the file is a CSV.
-            if (extension.equals("CSV")) {
-                addNode(path);
-            } else {
-                String fileName = new File(path).getName();
-                throw new NetworkCreationException(String.format("%s is not a CSV.", fileName));
-            }
+        for (List<List<String>> table : tables) {
+            addNode(table);
         }
 
         reorder();
+        getAllAttractors();
     }
 
     /**
-     * Takes in a truth table for a node and
-     * updates the transition map to reflect the truth table.
+     * Splits up a network file into individual truth tables.
      *
-     * @param path Path to the truth table.
-     * @throws IOException When an error occurs reading the file at path.
-     * @throws NetworkCreationException When there is an error in the truth table syntax.
+     * @param path The path to the network file.
+     * @return List of truth tables.
+     * @throws IOException When an error occurs reading the file.
      */
-    private void addNode(final String path) throws IOException, NetworkCreationException {
+    private List<List<List<String>>> deconstructFile(final String path) throws IOException {
+        List<List<List<String>>> tables = new ArrayList<>();
+
         BufferedReader reader = new BufferedReader(new FileReader(path));
         String line;
         List<List<String>> lines = new ArrayList<>();
@@ -86,8 +131,72 @@ public class BooleanNetwork {
             lines.add(Arrays.asList(line.split(",")));
         }
 
+        if (lines.get(0).get(0).startsWith("#") && lines.get(0).get(0).length() > 1) {
+            this.title = lines.remove(0).get(0).substring(1);
+        }
+
+        if (lines.get(0).get(0).startsWith("#") && lines.get(0).get(0).length() > 1) {
+            this.description = lines.remove(0).get(0).substring(1);
+        }
+
+
+        while (!lines.isEmpty()) {
+            if (lines.get(0).size() == 1) {
+                lines.remove(0);
+                continue;
+            }
+
+            List<List<String>> table = new ArrayList<>();
+            List<String> headings = lines.remove(0);
+            table.add(headings);
+
+            for (int x = 0; x < Math.pow(2, headings.size() - 1); x++) {
+                table.add(lines.remove(0));
+            }
+
+            tables.add(table);
+        }
+
+        return tables;
+    }
+
+    /**
+     * Creates all possible traces.
+     *
+     * @throws NetworkTraceException When an error occurs performing a trace.
+     */
+    private void getAllAttractors() throws NetworkTraceException {
+        for (State startingState : transitions.keySet()) {
+            List<State> attractor = trace(startingState.getNodeStates()).attractor;
+            boolean newAttractor = true;
+
+            for (List<State> attractor2 : attractors) {
+                List<State> tempAttractor = new ArrayList<>(attractor);
+                tempAttractor.retainAll(attractor2);
+
+                if (tempAttractor.size() > 0) {
+                    newAttractor = false;
+                    break;
+                }
+            }
+
+            if (newAttractor) {
+                attractors.add(attractor);
+            }
+        }
+    }
+
+    /**
+     * Takes in a truth table for a node and
+     * updates the transition map to reflect the truth table.
+     *
+     * @param table Truth table for the node to add.
+     * @throws IOException When an error occurs reading the file at path.
+     * @throws NetworkCreationException When there is an error in the truth table syntax.
+     */
+    private void addNode(final List<List<String>> table) throws IOException, NetworkCreationException {
         // Extract the headings from the file.
-        List<String> headings = lines.remove(0);
+        List<String> headings = table.remove(0);
 
         String nodeName = headings.get(headings.size() - 1);
         if (!nodeIndexes.containsKey(nodeName)) {
@@ -95,7 +204,7 @@ public class BooleanNetwork {
         }
 
         // Go through each entry in the truth table.
-        for (List<String> l : lines) {
+        for (List<String> l : table) {
             int result;
             Map<String, Integer> determinants = new HashMap<>();
             try {
