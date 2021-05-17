@@ -1,5 +1,8 @@
 package ui;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+import edu.uci.ics.jung.graph.UndirectedGraph;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -43,6 +46,10 @@ public class NetworkPanel extends JPanel {
         titledBorder.setTitleJustification(TitledBorder.CENTER);
 
         return titledBorder;
+    }
+
+    private void createGraph() {
+        
     }
 
 
