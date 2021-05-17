@@ -10,5 +10,6 @@ public class Main {
         View v = new View("Support Tool");
 
         Controller c = new Controller(m,v);
+        c.initController();
     }
 }
