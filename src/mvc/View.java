@@ -16,6 +16,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class View extends JFrame {
+    private Model model;
+
     private String title;
     private JMenuBar frameMenuBar;
     private JPanel networkPanel;
@@ -23,13 +25,14 @@ public class View extends JFrame {
     private JPanel infoPanel;
     private JMenuItem openMenuItem;
 
-    public View(String title) {
+    public View(String title, Model m) {
+        this.model = m;
         this.title = title;
-        this.frameMenuBar = createMenuBar();
-        this.networkPanel = createNetworkPanel();
-        this.transitionPanel = createTransitionPanel();
-        this.infoPanel = createInfoPanel();
-        this.openMenuItem = createOpenMenuItem();
+        this.frameMenuBar = new MenuBar();
+        this.networkPanel = new NetworkPanel();
+        this.transitionPanel = new TransitionPanel(model.getNetwork().getTransitions());
+        this.infoPanel = new InfoPanel();
+        this.openMenuItem = new JMenuItem("Open");
 
         setTitle(this.title);
         getContentPane().setLayout(new BorderLayout());
@@ -48,44 +51,15 @@ public class View extends JFrame {
         setVisible(true);
     }
 
-    public JMenuBar createMenuBar() {
-        return new MenuBar();
-    }
-
-    public JPanel createNetworkPanel() {
-        return new NetworkPanel();
-    }
-
-    public JPanel createTransitionPanel() {
-        return new TransitionPanel();
-    }
-
-    public JPanel createInfoPanel() {
-        return new InfoPanel();
-    }
-
-    public JMenuItem createOpenMenuItem() {
-        return new JMenuItem("Open");
-    }
-
     public String getTitle() {
         return title;
     }
 
-    public JMenuBar getFrameMenuBar() {
-        return frameMenuBar;
-    }
-
-    public JPanel getNetworkPanel() {
-        return networkPanel;
-    }
-
-    public JPanel getTransitionPanel() {
-        return transitionPanel;
-    }
-
-    public JPanel getInfoPanel() {
-        return infoPanel;
+    public void setTransitionPanel(JPanel transitionPanel) {
+        remove(this.transitionPanel);
+        this.transitionPanel = transitionPanel;
+        add(this.transitionPanel, BorderLayout.EAST);
+        revalidate();
     }
 
     public JMenuItem getOpenMenuItem() {

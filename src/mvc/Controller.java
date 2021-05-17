@@ -3,12 +3,17 @@ package mvc;
 import network.BooleanNetwork;
 import network.NetworkCreationException;
 import network.NetworkTraceException;
+import network.State;
+import ui.TransitionPanel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class Controller {
     Model model;
@@ -38,6 +43,7 @@ public class Controller {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             try {
                 model.setNetwork(new BooleanNetwork(fileChooser.getSelectedFile().toString()));
+                updateView();
                 System.out.println(model.getNetwork());
             } catch (IOException | NetworkCreationException | NetworkTraceException ex) {
                 System.out.println("Twas an error");
@@ -47,4 +53,7 @@ public class Controller {
         }
     }
 
+    private void updateView() {
+        view.setTransitionPanel(new TransitionPanel(model.getNetwork().getTransitions()));
+    }
 }
