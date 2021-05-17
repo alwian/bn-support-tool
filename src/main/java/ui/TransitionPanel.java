@@ -26,7 +26,8 @@ public class TransitionPanel extends JPanel {
 
         System.out.println(this.transitionTable);
         if (this.transitionTable != null) {
-            add(createTransitionTable(), BorderLayout.CENTER);
+            JScrollPane scrollPane = new JScrollPane(createTransitionTable());
+            add(scrollPane, BorderLayout.CENTER);
             add(this.exportButton, BorderLayout.SOUTH);
         }
     }
