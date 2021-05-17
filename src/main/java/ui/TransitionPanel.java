@@ -53,6 +53,7 @@ public class TransitionPanel extends JPanel {
             data[x][1] = transitionTable.get(key).toString();
         }
 
+
         return new JTable(data, columns);
     }
 }

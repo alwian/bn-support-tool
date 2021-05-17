@@ -1,10 +1,19 @@
 package ui;
 
+import network.BooleanNetwork;
+import network.State;
+
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.List;
 
 public class InfoPanel extends JPanel {
-    public InfoPanel() {
+    BooleanNetwork network;
+
+    public InfoPanel(BooleanNetwork network) {
+        this.network = network;
         build();
     }
 
@@ -15,7 +24,7 @@ public class InfoPanel extends JPanel {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Trace", createTraceTab());
-        tabbedPane.addTab("Attractor", createAttractorTab());
+        tabbedPane.addTab("Attractors", createAttractorTab());
 
         add(tabbedPane);
     }
@@ -25,6 +34,40 @@ public class InfoPanel extends JPanel {
     }
 
     private JPanel createAttractorTab() {
-        return new JPanel();
+        JPanel tab = new JPanel();
+        tab.setLayout(new BorderLayout());
+        tab.setBorder(createBorder("The current network contains the following attractors"));
+
+        JList attractorsList = extractAttractors();
+        tab.add(attractorsList);
+
+        return tab;
+    }
+
+    private JList extractAttractors() {
+        String[] lines = new String[network.getAttractors().size()];
+        for (int x = 0; x < network.getAttractors().size(); x++) {
+            StringBuilder line = new StringBuilder();
+            line.append("Attractor ").append(x).append(": ");
+
+            for (int y = 0; y < network.getAttractors().get(x).size(); y++) {
+                line.append(network.getAttractors().get(x).get(y));
+                if (network.getAttractors().get(x).size() - y > 1) {
+                    line.append(" -> ");
+                }
+            }
+
+            lines[x] = line.toString();
+        }
+        return new JList(lines);
+    }
+
+    private TitledBorder createBorder(String title) {
+        Border solidBorder = BorderFactory.createLineBorder(Color.white);
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(solidBorder, title);
+        titledBorder.setTitlePosition(TitledBorder.TOP);
+        titledBorder.setTitleJustification(TitledBorder.CENTER);
+
+        return titledBorder;
     }
 }

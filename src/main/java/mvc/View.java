@@ -1,19 +1,12 @@
 package mvc;
 
-import network.BooleanNetwork;
-import network.NetworkCreationException;
-import network.NetworkTraceException;
 import ui.InfoPanel;
 import ui.MenuBar;
 import ui.NetworkPanel;
 import ui.TransitionPanel;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 
 public class View extends JFrame {
     private Model model;
@@ -33,7 +26,7 @@ public class View extends JFrame {
         this.networkPanel = new NetworkPanel();
         this.exportButton = new JButton("Export State Graph");
         this.transitionPanel = new TransitionPanel(model.getNetwork().getTransitions(), this.exportButton);
-        this.infoPanel = new InfoPanel();
+        this.infoPanel = new InfoPanel(model.getNetwork());
         this.openMenuItem = new JMenuItem("Open");
 
         setTitle(this.title);
@@ -61,7 +54,7 @@ public class View extends JFrame {
         return transitionPanel;
     }
 
-    public void setTransitionPanel(JPanel transitionPanel) {
+    public void setTransitionPanel(TransitionPanel transitionPanel) {
         remove(this.transitionPanel);
         this.transitionPanel = transitionPanel;
         add(this.transitionPanel, BorderLayout.EAST);
@@ -73,4 +66,11 @@ public class View extends JFrame {
     }
 
     public JButton getExportButton() { return exportButton; }
+
+    public void setInfoPanel(InfoPanel infoPanel) {
+        remove(this.infoPanel);
+        this.infoPanel = infoPanel;
+        add(this.infoPanel, BorderLayout.SOUTH);
+        revalidate();
+    }
 }
