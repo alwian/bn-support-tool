@@ -24,13 +24,15 @@ public class View extends JFrame {
     private JPanel transitionPanel;
     private JPanel infoPanel;
     private JMenuItem openMenuItem;
+    private JButton exportButton;
 
     public View(String title, Model m) {
         this.model = m;
         this.title = title;
         this.frameMenuBar = new MenuBar();
         this.networkPanel = new NetworkPanel();
-        this.transitionPanel = new TransitionPanel(model.getNetwork().getTransitions());
+        this.exportButton = new JButton("Export State Graph");
+        this.transitionPanel = new TransitionPanel(model.getNetwork().getTransitions(), this.exportButton);
         this.infoPanel = new InfoPanel();
         this.openMenuItem = new JMenuItem("Open");
 
@@ -55,6 +57,10 @@ public class View extends JFrame {
         return title;
     }
 
+    public JPanel getTransitionPanel() {
+        return transitionPanel;
+    }
+
     public void setTransitionPanel(JPanel transitionPanel) {
         remove(this.transitionPanel);
         this.transitionPanel = transitionPanel;
@@ -65,4 +71,6 @@ public class View extends JFrame {
     public JMenuItem getOpenMenuItem() {
         return openMenuItem;
     }
+
+    public JButton getExportButton() { return exportButton; }
 }

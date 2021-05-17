@@ -1,6 +1,5 @@
 package ui;
 
-import network.BooleanNetwork;
 import network.State;
 
 import javax.swing.*;
@@ -11,9 +10,11 @@ import java.util.Map;
 
 public class TransitionPanel extends JPanel {
     Map<State, State> transitionTable;
+    JButton exportButton;
 
-    public TransitionPanel(Map<State,State> transitions) {
+    public TransitionPanel(Map<State, State> transitions, JButton exportButton) {
         this.transitionTable = transitions;
+        this.exportButton = exportButton;
         build();
     }
 
@@ -25,7 +26,8 @@ public class TransitionPanel extends JPanel {
 
         System.out.println(this.transitionTable);
         if (this.transitionTable != null) {
-            add(createTransitionTable());
+            add(createTransitionTable(), BorderLayout.CENTER);
+            add(this.exportButton, BorderLayout.SOUTH);
         }
     }
 

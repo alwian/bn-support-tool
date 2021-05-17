@@ -47,12 +47,4 @@ public class NetworkPanel extends JPanel {
 
         return titledBorder;
     }
-
-    private void createGraph() {
-        
-    }
-
-
-
-
 }

@@ -8,12 +8,9 @@ import ui.TransitionPanel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class Controller {
     Model model;
@@ -26,6 +23,7 @@ public class Controller {
 
     public void initController() {
         view.getOpenMenuItem().addActionListener(e -> loadNetwork());
+        view.getExportButton().addActionListener(e -> exportStateGraph());
     }
 
     private void displayError(String error) {
@@ -54,6 +52,40 @@ public class Controller {
     }
 
     private void updateView() {
-        view.setTransitionPanel(new TransitionPanel(model.getNetwork().getTransitions()));
+        view.setTransitionPanel(new TransitionPanel(model.getNetwork().getTransitions(), view.getExportButton()));
+    }
+
+    private void exportStateGraph() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("dot", "dot"));
+
+        int returnValue = fileChooser.showSaveDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            try {
+                String path = fileChooser.getSelectedFile().toString();
+                writeStateGraph(path);
+                JOptionPane.showMessageDialog(view, "Graph exported successfully.", "Export Complete", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException ex) {
+                System.out.println("Twas an error");
+                System.out.println("Error: " + ex.getMessage());
+                displayError(ex.getMessage());
+            }
+        }
+    }
+
+    private void writeStateGraph(String path) throws IOException {
+        FileWriter writer = new FileWriter(path);
+
+        writer.write("digraph export {\n");
+        for (State s : model.getNetwork().getTransitions().keySet()) {
+            String from = s.toString().replaceAll("[\\[\\], ]", "");
+            String to = model.getNetwork().getTransitions().get(s).toString().replaceAll("[\\[\\], ]", "");
+            writer.append(String.format("\t%s -> %s\n", from, to));
+        }
+        writer.append("}");
+        writer.close();
     }
 }
