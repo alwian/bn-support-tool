@@ -1,5 +1,8 @@
 package ui;
 
+import network.BooleanNetwork;
+import network.State;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -26,5 +29,4 @@ public class TransitionPanel extends JPanel {
 
         return titledBorder;
     }
-
 }

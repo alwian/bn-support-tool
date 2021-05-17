@@ -63,6 +63,10 @@ public class BooleanNetwork {
         return description;
     }
 
+    public Map<State, State> getTransitions() {
+        return transitions;
+    }
+
     /**
      * Gets all of the attractors in the network.
      *

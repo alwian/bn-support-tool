@@ -1,10 +1,17 @@
+import network.BooleanNetwork;
+import network.NetworkCreationException;
+import network.NetworkTraceException;
 import ui.InfoPanel;
 import ui.NetworkPanel;
 import ui.MenuBar;
 import ui.TransitionPanel;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 /**
  * Main program class.
@@ -12,7 +19,7 @@ import java.awt.*;
  * @author Alex Anderson
  */
 public class SupportTool extends JFrame {
-    GridBagConstraints gbc = new GridBagConstraints();
+    BooleanNetwork network;
 
     public SupportTool() {
         buildUI();
@@ -190,7 +197,7 @@ public class SupportTool extends JFrame {
         setSize(1000,800);
         setLocationRelativeTo(null);
         getContentPane().setBackground(Color.DARK_GRAY);
-        setJMenuBar(new MenuBar());
+        setJMenuBar(createMenuBar());
 
         add(createNetworkPanel(), BorderLayout.CENTER);
         add(createInfoPanel(), BorderLayout.SOUTH);
@@ -200,6 +207,44 @@ public class SupportTool extends JFrame {
     }
 
 
+
+    public JMenuBar createMenuBar() {
+        JMenuBar menuBar = new MenuBar();
+
+        JMenuItem openOption = new JMenuItem("Open");
+        openOption.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setMultiSelectionEnabled(false);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("csv", "csv"));
+
+                int returnValue = fileChooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        network = new BooleanNetwork(fileChooser.getSelectedFile().toString());
+                        invalidate();
+                    } catch (IOException | NetworkCreationException | NetworkTraceException ex) {
+                        System.out.println("Error: " + ex.getMessage());
+                        displayError(ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        menuBar.getMenu(0).add(openOption);
+        return menuBar;
+    }
+
+    public void refresh() {
+        revalidate();
+    }
+
+    public void displayError(String error) {
+        JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
+    }
 
     public JPanel createNetworkPanel() {
         return new NetworkPanel();
