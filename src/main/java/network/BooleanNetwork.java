@@ -30,6 +30,8 @@ public class BooleanNetwork {
      */
     private Map<State, State> transitions = new HashMap<>();
 
+    public Map<String, List<String>> determinants = new HashMap<>();
+
     /**
      * All of the attractors in the network.
      */
@@ -203,6 +205,9 @@ public class BooleanNetwork {
         List<String> headings = table.remove(0);
 
         String nodeName = headings.get(headings.size() - 1);
+
+        determinants.put(nodeName, headings.subList(0, headings.size() - 1));
+
         if (!nodeIndexes.containsKey(nodeName)) {
             nodeIndexes.put(nodeName, nodeIndexes.size());
         }

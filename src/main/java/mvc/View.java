@@ -23,7 +23,7 @@ public class View extends JFrame {
         this.model = m;
         this.title = title;
         this.frameMenuBar = new MenuBar();
-        this.networkPanel = new NetworkPanel();
+        this.networkPanel = new NetworkPanel(model.getNetwork());
         this.exportButton = new JButton("Export State Graph");
         this.transitionPanel = new TransitionPanel(model.getNetwork().getTransitions(), this.exportButton);
         this.infoPanel = new InfoPanel(model.getNetwork());
@@ -43,6 +43,8 @@ public class View extends JFrame {
         add(this.infoPanel, BorderLayout.SOUTH);
         add(this.transitionPanel, BorderLayout.EAST);
 
+        pack();
+        setResizable(false);
         setVisible(true);
     }
 
@@ -71,6 +73,13 @@ public class View extends JFrame {
         remove(this.infoPanel);
         this.infoPanel = infoPanel;
         add(this.infoPanel, BorderLayout.SOUTH);
+        revalidate();
+    }
+
+    public void setNetworkPanel(NetworkPanel networkPanel) {
+        remove(this.networkPanel);
+        this.networkPanel = networkPanel;
+        add(this.networkPanel, BorderLayout.CENTER);
         revalidate();
     }
 }

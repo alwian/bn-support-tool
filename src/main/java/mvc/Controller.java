@@ -5,6 +5,7 @@ import network.NetworkCreationException;
 import network.NetworkTraceException;
 import network.State;
 import ui.InfoPanel;
+import ui.NetworkPanel;
 import ui.TransitionPanel;
 
 import javax.swing.*;
@@ -55,6 +56,7 @@ public class Controller {
     private void updateView() {
         view.setTransitionPanel(new TransitionPanel(model.getNetwork().getTransitions(), view.getExportButton()));
         view.setInfoPanel(new InfoPanel(model.getNetwork()));
+        view.setNetworkPanel(new NetworkPanel(model.getNetwork()));
     }
 
     private void exportStateGraph() {
