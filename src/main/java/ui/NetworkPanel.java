@@ -8,11 +8,13 @@ import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.*;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.decorators.EllipseVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.visualization.renderers.BasicEdgeArrowRenderingSupport;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 import network.BooleanNetwork;
 import network.State;
@@ -21,9 +23,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
@@ -75,83 +74,86 @@ public class NetworkPanel extends JPanel {
     }
 
     private JPanel createWiringTab() {
-        Graph<Integer, String> graph = new DirectedSparseGraph<>();
-        Map<String, Integer> vertexIDs = new HashMap<>();
-        String[] nodeNames =  network.determinants.keySet().toArray(new String[0]);
-
-        for (int x = 0; x < nodeNames.length; x++) {
-            vertexIDs.put(nodeNames[x], x);
-            graph.addVertex(x);
-        }
-
-        for (String nodeName : nodeNames) {
-            System.out.print(nodeName + " -> ");
-            String[] determinants = network.determinants.get(nodeName).toArray(new String[0]);
-            System.out.println(Arrays.toString(determinants));
-            for (int y = 0; y < network.determinants.get(nodeName).size(); y++) {
-                graph.addEdge(nodeName + " -> " + determinants[y], vertexIDs.get(determinants[y]), vertexIDs.get(nodeName));
-            }
-        }
-
-
-        VisualizationViewer<Integer, Number> vv = new VisualizationViewer(new CircleLayout(graph));
-        vv.getRenderContext().setVertexLabelTransformer(i -> nodeNames[i]);
-
-        Function<Integer, Paint> vertexPaint = i -> Color.WHITE;
-        Function<Integer, Shape> vertexSize = i -> new Ellipse2D.Double(-35,-35,70,70);
-
-        vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-        vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
-        vv.getRenderContext().setVertexShapeTransformer(vertexSize);
-        vv.setForeground(Color.BLACK);
+        VisualizationViewer<String, String> vv = new VisualizationViewer(new CircleLayout(createWiringGraph()));
         vv.setBackground(Color.DARK_GRAY);
+
+        Function<String, Paint> vertexPaint = i -> Color.WHITE;
+        vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+
+        Function<String, String> vertexLabel = i -> i.toString();
+        vv.getRenderContext().setVertexLabelTransformer(vertexLabel);
+        vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
+
+        Function<String, Shape> vertexShape = i -> new Ellipse2D.Double(-35,-35,70,70);
+        vv.getRenderContext().setVertexShapeTransformer(vertexShape);
+
+        Function<String, Paint> edgePaint = i -> Color.WHITE;
+        vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+
+        Function<String, Paint> arrowPaint = i -> Color.WHITE;
+        vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 
         DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
         gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
         vv.setGraphMouse(gm);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout());
         panel.add(vv);
-
         return panel;
     }
 
     private JPanel createTransitionTab() {
-        Graph<Integer, String> graph = new DirectedSparseGraph<>();
-        Map<String, Integer> vertexIDs = new HashMap<>();
-
-        State[] states = network.getTransitions().keySet().toArray(new State[0]);
-        for (int x = 0; x < states.length; x++) {
-            vertexIDs.put(states[x].toString(), x);
-            graph.addVertex(x);
-        }
-
-        for (State state : states) {
-            graph.addEdge(state.toString() + " -> " + network.getTransitions().get(state).toString(), vertexIDs.get(state.toString()), vertexIDs.get(network.getTransitions().get(state).toString()));
-        }
-
-        VisualizationViewer<Integer, Number> vv = new VisualizationViewer(new CircleLayout(graph));
-
-        vv.getRenderContext().setVertexLabelTransformer(i -> states[i].toString().replaceAll("[\\[\\], ]", ""));
-
-        Function<Integer, Paint> vertexPaint = i -> Color.WHITE;
-        Function<Integer, Shape> vertexSize = i -> new Ellipse2D.Double(-35,-35,70,70);
-
-        vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-        vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
-        vv.getRenderContext().setVertexShapeTransformer(vertexSize);
-        vv.setForeground(Color.BLACK);
+        VisualizationViewer<State, String> vv = new VisualizationViewer(new CircleLayout(createTransitionGraph()));
         vv.setBackground(Color.DARK_GRAY);
+
+        Function<State, Paint> vertexPaint = i -> Color.WHITE;
+        vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+
+        Function<State, String> vertexLabel = i -> i.toString().replaceAll("[\\[\\], ]", "");
+        vv.getRenderContext().setVertexLabelTransformer(vertexLabel);
+        vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
+
+        Function<State, Shape> vertexShape = i -> new Ellipse2D.Double(-35,-35,70,70);
+        vv.getRenderContext().setVertexShapeTransformer(vertexShape);
+
+        Function<String, Paint> edgePaint = i -> Color.WHITE;
+        vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+
+        Function<String, Paint> arrowPaint = i -> Color.WHITE;
+        vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 
         DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
         gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
         vv.setGraphMouse(gm);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout());
         panel.add(vv);
-
         return panel;
+    }
+
+    private Graph createWiringGraph() {
+        Graph<String, String> graph = new DirectedSparseGraph<>();
+
+        String[] nodeNames =  network.determinants.keySet().toArray(new String[0]);
+        for (String node : nodeNames) {
+            graph.addVertex(node);
+
+            String[] determinants = network.determinants.get(node).toArray(new String[0]);
+            for (String determinant : determinants) {
+                graph.addEdge(node + " -> " + determinant, determinant, node);
+            }
+        }
+        return graph;
+    }
+    private Graph createTransitionGraph() {
+        Graph<State, String> graph = new DirectedSparseGraph<>();
+
+        for (State s : network.getTransitions().keySet()) {
+            graph.addVertex(s);
+
+            State nextState = network.getTransitions().get(s);
+            graph.addEdge(s.toString() + " -> " + nextState.toString(), s, nextState);
+        }
+        return graph;
     }
 }
