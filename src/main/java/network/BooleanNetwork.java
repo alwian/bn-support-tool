@@ -47,6 +47,8 @@ public class BooleanNetwork {
      */
     private String[] nodes;
 
+    public State currentState;
+
     /**
      * Accessor for title.
      *
@@ -87,6 +89,10 @@ public class BooleanNetwork {
         return nodes;
     }
 
+    public Map<String, Integer> getNodeIndexes() {
+        return nodeIndexes;
+    }
+
     /**
      * Constructor for BooleanNetwork.
      *
@@ -116,6 +122,10 @@ public class BooleanNetwork {
 
         reorder();
         getAllAttractors();
+
+        int[] currentNodeStates = new int[nodes.length];
+        Arrays.fill(currentNodeStates, 0);
+        currentState = new State(currentNodeStates);
     }
 
     /**

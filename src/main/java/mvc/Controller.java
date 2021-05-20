@@ -1,5 +1,6 @@
 package mvc;
 
+import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import network.BooleanNetwork;
 import network.NetworkCreationException;
 import network.NetworkTraceException;
@@ -10,6 +11,8 @@ import ui.TransitionPanel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,6 +29,13 @@ public class Controller {
     public void initController() {
         view.getOpenMenuItem().addActionListener(e -> loadNetwork());
         view.getExportButton().addActionListener(e -> exportStateGraph());
+        view.getNetworkPanel().getWiringViewer().getPickedVertexState().addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                flipWiringNode(e);
+            }
+        });
+        view.getNetworkPanel().getWiringViewer().addKeyListener(view.getNetworkPanel().getWiringMouse().getModeKeyListener());
     }
 
     private void displayError(String error) {
@@ -57,6 +67,7 @@ public class Controller {
         view.setTransitionPanel(new TransitionPanel(model.getNetwork().getTransitions(), view.getExportButton()));
         view.setInfoPanel(new InfoPanel(model.getNetwork()));
         view.setNetworkPanel(new NetworkPanel(model.getNetwork()));
+        initController();
     }
 
     private void exportStateGraph() {
@@ -91,5 +102,18 @@ public class Controller {
         }
         writer.append("}");
         writer.close();
+    }
+
+    private void flipWiringNode(ItemEvent e) {
+        Object selected = e.getItem();
+
+        if (selected instanceof String) {
+            String vertex = (String) selected;
+            System.out.println(vertex + "selected.");
+            int currentState = model.getNetwork().currentState.getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)];
+            currentState = currentState == 0 ? 1 : 0;
+            model.getNetwork().currentState.getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)] = currentState;
+            updateView();
+        }
     }
 }

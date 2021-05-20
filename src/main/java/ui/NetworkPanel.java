@@ -27,6 +27,19 @@ import java.awt.geom.Ellipse2D;
 public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
 
+    public VisualizationViewer<String, String> getWiringViewer() {
+        return wiringViewer;
+    }
+
+    private VisualizationViewer<String, String> wiringViewer;
+
+    public DefaultModalGraphMouse getWiringMouse() {
+        return wiringMouse;
+    }
+
+    private DefaultModalGraphMouse wiringMouse;
+
+
     public NetworkPanel(BooleanNetwork network) {
         this.network = network;
         build();
@@ -77,10 +90,10 @@ public class NetworkPanel extends JPanel {
         VisualizationViewer<String, String> vv = new VisualizationViewer(new CircleLayout(createWiringGraph()));
         vv.setBackground(Color.DARK_GRAY);
 
-        Function<String, Paint> vertexPaint = i -> Color.WHITE;
+        Function<String, Paint> vertexPaint = i -> network.currentState.getNodeStates()[network.getNodeIndexes().get(i)] == 0 ? Color.RED : Color.GREEN;
         vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 
-        Function<String, String> vertexLabel = i -> i.toString();
+        Function<String, String> vertexLabel = i -> i;
         vv.getRenderContext().setVertexLabelTransformer(vertexLabel);
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
 
@@ -94,8 +107,10 @@ public class NetworkPanel extends JPanel {
         vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 
         DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
-        gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
+        gm.setMode(ModalGraphMouse.Mode.PICKING);
         vv.setGraphMouse(gm);
+        this.wiringViewer = vv;
+        this.wiringMouse = gm;
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(vv);

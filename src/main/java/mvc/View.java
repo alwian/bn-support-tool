@@ -12,10 +12,15 @@ public class View extends JFrame {
     private Model model;
 
     private String title;
-    private JMenuBar frameMenuBar;
-    private JPanel networkPanel;
-    private JPanel transitionPanel;
-    private JPanel infoPanel;
+    private MenuBar frameMenuBar;
+
+    public NetworkPanel getNetworkPanel() {
+        return networkPanel;
+    }
+
+    private NetworkPanel networkPanel;
+    private TransitionPanel transitionPanel;
+    private InfoPanel infoPanel;
     private JMenuItem openMenuItem;
     private JButton exportButton;
 
