@@ -16,6 +16,8 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class Controller {
     Model model;
@@ -35,6 +37,7 @@ public class Controller {
         view.getNetworkPanel().getTransitionViewer().addKeyListener(view.getNetworkPanel().getTransitionMouse().getModeKeyListener());
         view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork(1));
         view.getNetworkPanel().getBackButton().addActionListener(e -> updateNetwork(0));
+        view.getNetworkPanel().getExportButton().addActionListener(e -> exportGraphs());
     }
 
     private void displayError(String error) {
@@ -130,5 +133,52 @@ public class Controller {
     private void updateNetwork(int direction) {
         model.getNetwork().update(direction);
         updateView();
+    }
+
+    private void exportGraphs() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("dot", "dot"));
+
+        int returnValue = fileChooser.showSaveDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            try {
+                String path = fileChooser.getSelectedFile().toString();
+                writeWiringGraph(path + File.separator + "wiring.dot");
+                writeTransitionGraph(path + File.separator + "transition.dot");
+                JOptionPane.showMessageDialog(view, "Graphs exported successfully.", "Export Complete", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException ex) {
+                System.out.println("Twas an error");
+                System.out.println("Error: " + ex.getMessage());
+                displayError(ex.getMessage());
+            }
+        }
+    }
+
+    private void writeWiringGraph(String path) throws IOException {
+        FileWriter writer = new FileWriter(path);
+
+        writer.write("digraph export {\n");
+        for (Map.Entry entry : model.getNetwork().determinants.entrySet()) {
+            for (String determinant : (List<String>) entry.getValue()) {
+                writer.append(String.format("\t%s -> %s\n", determinant, entry.getKey()));
+            }
+        }
+        writer.append("}");
+        writer.close();
+    }
+    private void writeTransitionGraph(String path) throws IOException {
+        FileWriter writer = new FileWriter(path);
+
+        writer.write("digraph export {\n");
+        for (State s : model.getNetwork().getTransitions().keySet()) {
+            String from = s.toString().replaceAll("[\\[\\], ]", "");
+            String to = model.getNetwork().getTransitions().get(s).toString().replaceAll("[\\[\\], ]", "");
+            writer.append(String.format("\t%s -> %s\n", from, to));
+        }
+        writer.append("}");
+        writer.close();
     }
 }

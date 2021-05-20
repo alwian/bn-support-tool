@@ -28,6 +28,12 @@ public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
     private int selected;
 
+    public JButton getExportButton() {
+        return exportButton;
+    }
+
+    private JButton exportButton;
+
     public JButton getForwardButton() {
         return forwardButton;
     }
@@ -217,11 +223,12 @@ public class NetworkPanel extends JPanel {
         stepControls.add(forwardButton);
 
 
-//        JPanel exportControls = new JPanel(new GridLayout());
-//        exportControls.add(new JButton("Export Graphs"));
+        JPanel exportControls = new JPanel(new GridLayout());
+        exportButton = new JButton("Export Graphs");
+        exportControls.add(exportButton);
 
         panel.add(stepControls);
-        //panel.add(exportControls);
+        panel.add(exportControls);
         return panel;
     }
 }
