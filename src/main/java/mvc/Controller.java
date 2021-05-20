@@ -48,7 +48,7 @@ public class Controller {
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("csv", "csv"));
 
-        int returnValue = fileChooser.showOpenDialog(null);
+        int returnValue = fileChooser.showOpenDialog(view);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             try {
                 model.setNetwork(new BooleanNetwork(fileChooser.getSelectedFile().toString()));
