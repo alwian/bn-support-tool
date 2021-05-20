@@ -29,13 +29,10 @@ public class Controller {
     public void initController() {
         view.getOpenMenuItem().addActionListener(e -> loadNetwork());
         view.getExportButton().addActionListener(e -> exportStateGraph());
-        view.getNetworkPanel().getWiringViewer().getPickedVertexState().addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                flipWiringNode(e);
-            }
-        });
+        view.getNetworkPanel().getWiringViewer().getPickedVertexState().addItemListener(e -> flipWiringNode(e));
         view.getNetworkPanel().getWiringViewer().addKeyListener(view.getNetworkPanel().getWiringMouse().getModeKeyListener());
+        view.getNetworkPanel().getTransitionViewer().getPickedVertexState().addItemListener(e -> changeState(e));
+        view.getNetworkPanel().getTransitionViewer().addKeyListener(view.getNetworkPanel().getTransitionMouse().getModeKeyListener());
     }
 
     private void displayError(String error) {
@@ -66,7 +63,7 @@ public class Controller {
     private void updateView() {
         view.setTransitionPanel(new TransitionPanel(model.getNetwork().getTransitions(), view.getExportButton()));
         view.setInfoPanel(new InfoPanel(model.getNetwork()));
-        view.setNetworkPanel(new NetworkPanel(model.getNetwork()));
+        view.setNetworkPanel(new NetworkPanel(model.getNetwork(), view.getNetworkPanel().getTabs().getSelectedIndex()));
         initController();
     }
 
@@ -110,9 +107,20 @@ public class Controller {
         if (selected instanceof String) {
             String vertex = (String) selected;
             System.out.println(vertex + "selected.");
-            int currentState = model.getNetwork().currentState.getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)];
+            int currentState = model.getNetwork().getCurrentState().getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)];
             currentState = currentState == 0 ? 1 : 0;
-            model.getNetwork().currentState.getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)] = currentState;
+            model.getNetwork().getCurrentState().getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)] = currentState;
+            updateView();
+        }
+    }
+
+    private void changeState(ItemEvent e) {
+        Object selected = e.getItem();
+
+        if (selected instanceof State) {
+            State vertex = (State) selected;
+            System.out.println(vertex + "selected.");
+            model.getNetwork().setCurrentState(vertex);
             updateView();
         }
     }

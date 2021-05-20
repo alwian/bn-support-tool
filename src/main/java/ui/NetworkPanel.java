@@ -26,6 +26,13 @@ import java.awt.geom.Ellipse2D;
 
 public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
+    private int selected;
+
+    public JTabbedPane getTabs() {
+        return tabs;
+    }
+
+    private JTabbedPane tabs;
 
     public VisualizationViewer<String, String> getWiringViewer() {
         return wiringViewer;
@@ -39,9 +46,21 @@ public class NetworkPanel extends JPanel {
 
     private DefaultModalGraphMouse wiringMouse;
 
+    private VisualizationViewer transitionViewer;
 
-    public NetworkPanel(BooleanNetwork network) {
+    public VisualizationViewer getTransitionViewer() {
+        return transitionViewer;
+    }
+
+    public DefaultModalGraphMouse getTransitionMouse() {
+        return transitionMouse;
+    }
+
+    private DefaultModalGraphMouse transitionMouse;
+
+    public NetworkPanel(BooleanNetwork network, int selected) {
         this.network = network;
+        this.selected = selected;
         build();
     }
 
@@ -51,13 +70,14 @@ public class NetworkPanel extends JPanel {
 
         add(createDescriptionPanel(), BorderLayout.NORTH);
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setBackground(Color.WHITE);
-        tabbedPane.setForeground(Color.BLACK);
+        tabs = new JTabbedPane();
+        tabs.setBackground(Color.WHITE);
+        tabs.setForeground(Color.BLACK);
 
-        tabbedPane.addTab("Wiring Diagram", createWiringTab());
-        tabbedPane.addTab("Transition Diagram", createTransitionTab());
-        add(tabbedPane, BorderLayout.CENTER);
+        tabs.addTab("Wiring Diagram", createWiringTab());
+        tabs.addTab("Transition Diagram", createTransitionTab());
+        tabs.setSelectedIndex(this.selected);
+        add(tabs, BorderLayout.CENTER);
     }
 
     private JPanel createDescriptionPanel() {
@@ -90,7 +110,7 @@ public class NetworkPanel extends JPanel {
         VisualizationViewer<String, String> vv = new VisualizationViewer(new CircleLayout(createWiringGraph()));
         vv.setBackground(Color.DARK_GRAY);
 
-        Function<String, Paint> vertexPaint = i -> network.currentState.getNodeStates()[network.getNodeIndexes().get(i)] == 0 ? Color.RED : Color.GREEN;
+        Function<String, Paint> vertexPaint = i -> network.getCurrentState().getNodeStates()[network.getNodeIndexes().get(i)] == 0 ? Color.RED : Color.GREEN;
         vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 
         Function<String, String> vertexLabel = i -> i;
@@ -121,7 +141,7 @@ public class NetworkPanel extends JPanel {
         VisualizationViewer<State, String> vv = new VisualizationViewer(new CircleLayout(createTransitionGraph()));
         vv.setBackground(Color.DARK_GRAY);
 
-        Function<State, Paint> vertexPaint = i -> Color.WHITE;
+        Function<State, Paint> vertexPaint = i -> i.equals(network.getCurrentState()) ? Color.GRAY : Color.WHITE;
         vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 
         Function<State, String> vertexLabel = i -> i.toString().replaceAll("[\\[\\], ]", "");
@@ -138,8 +158,10 @@ public class NetworkPanel extends JPanel {
         vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
 
         DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
-        gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
+        gm.setMode(ModalGraphMouse.Mode.PICKING);
         vv.setGraphMouse(gm);
+        this.transitionViewer = vv;
+        this.transitionMouse = gm;
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(vv);

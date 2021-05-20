@@ -28,7 +28,7 @@ public class View extends JFrame {
         this.model = m;
         this.title = title;
         this.frameMenuBar = new MenuBar();
-        this.networkPanel = new NetworkPanel(model.getNetwork());
+        this.networkPanel = new NetworkPanel(model.getNetwork(), 0);
         this.exportButton = new JButton("Export State Graph");
         this.transitionPanel = new TransitionPanel(model.getNetwork().getTransitions(), this.exportButton);
         this.infoPanel = new InfoPanel(model.getNetwork());

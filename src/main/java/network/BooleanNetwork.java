@@ -47,7 +47,15 @@ public class BooleanNetwork {
      */
     private String[] nodes;
 
-    public State currentState;
+    public void setCurrentState(State currentState) {
+        this.currentState = currentState;
+    }
+
+    public State getCurrentState() {
+        return currentState;
+    }
+
+    private State currentState;
 
     /**
      * Accessor for title.
