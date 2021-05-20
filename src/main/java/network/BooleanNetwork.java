@@ -30,7 +30,19 @@ public class BooleanNetwork {
      */
     private Map<State, State> transitions = new HashMap<>();
 
-    public Map<String, List<String>> determinants = new HashMap<>();
+    public Map<String, List<String>> getDeterminants() {
+        return determinants;
+    }
+
+    private Map<String, List<String>> determinants = new HashMap<>();
+
+    public Map<String, Integer> getModifiers() {
+        return modifiers;
+    }
+
+    private Map<String, Integer> modifiers = new HashMap<>();
+
+
 
     /**
      * All of the attractors in the network.
@@ -134,6 +146,10 @@ public class BooleanNetwork {
         int[] currentNodeStates = new int[nodes.length];
         Arrays.fill(currentNodeStates, 0);
         currentState = new State(currentNodeStates);
+
+        for (String node : nodes) {
+            modifiers.put(node,0);
+        }
     }
 
     /**

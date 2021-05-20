@@ -3,7 +3,7 @@ package mvc;
 import ui.InfoPanel;
 import ui.MenuBar;
 import ui.NetworkPanel;
-import ui.TransitionPanel;
+import ui.ModifierPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,7 @@ public class View extends JFrame {
     }
 
     private NetworkPanel networkPanel;
-    private TransitionPanel transitionPanel;
+    private ModifierPanel modifierPanel;
     private InfoPanel infoPanel;
     private JMenuItem openMenuItem;
     private JButton exportButton;
@@ -30,14 +30,13 @@ public class View extends JFrame {
         this.frameMenuBar = new MenuBar();
         this.networkPanel = new NetworkPanel(model.getNetwork(), 0);
         this.exportButton = new JButton("Export State Graph");
-        this.transitionPanel = new TransitionPanel(model.getNetwork().getTransitions(), this.exportButton);
+        this.modifierPanel = new ModifierPanel(model.getNetwork());
         this.infoPanel = new InfoPanel(model.getNetwork());
         this.openMenuItem = new JMenuItem("Open");
 
         setTitle(this.title);
         getContentPane().setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(new Dimension(1000,800));
         setLocationRelativeTo(null);
         getContentPane().setBackground(Color.DARK_GRAY);
 
@@ -46,10 +45,10 @@ public class View extends JFrame {
 
         add(this.networkPanel, BorderLayout.CENTER);
         add(this.infoPanel, BorderLayout.SOUTH);
-        add(this.transitionPanel, BorderLayout.EAST);
+        add(this.modifierPanel, BorderLayout.EAST);
 
         pack();
-        setResizable(false);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
     }
 
@@ -58,13 +57,13 @@ public class View extends JFrame {
     }
 
     public JPanel getTransitionPanel() {
-        return transitionPanel;
+        return modifierPanel;
     }
 
-    public void setTransitionPanel(TransitionPanel transitionPanel) {
-        remove(this.transitionPanel);
-        this.transitionPanel = transitionPanel;
-        add(this.transitionPanel, BorderLayout.EAST);
+    public void setTransitionPanel(ModifierPanel modifierPanel) {
+        remove(this.modifierPanel);
+        this.modifierPanel = modifierPanel;
+        add(this.modifierPanel, BorderLayout.EAST);
         revalidate();
     }
 

@@ -8,14 +8,15 @@ import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.*;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.*;
 import edu.uci.ics.jung.visualization.decorators.EllipseVertexShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.BasicEdgeArrowRenderingSupport;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
+import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 import network.BooleanNetwork;
 import network.State;
 
@@ -23,6 +24,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 
 public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
@@ -190,11 +192,11 @@ public class NetworkPanel extends JPanel {
     private Graph createWiringGraph() {
         Graph<String, String> graph = new DirectedSparseGraph<>();
 
-        String[] nodeNames =  network.determinants.keySet().toArray(new String[0]);
+        String[] nodeNames =  network.getDeterminants().keySet().toArray(new String[0]);
         for (String node : nodeNames) {
             graph.addVertex(node);
 
-            String[] determinants = network.determinants.get(node).toArray(new String[0]);
+            String[] determinants = network.getDeterminants().get(node).toArray(new String[0]);
             for (String determinant : determinants) {
                 graph.addEdge(node + " -> " + determinant, determinant, node);
             }
