@@ -28,6 +28,17 @@ public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
     private int selected;
 
+    public JButton getForwardButton() {
+        return forwardButton;
+    }
+
+    public JButton getBackButton() {
+        return backButton;
+    }
+
+    private JButton forwardButton;
+    private JButton backButton;
+
     public JTabbedPane getTabs() {
         return tabs;
     }
@@ -78,6 +89,8 @@ public class NetworkPanel extends JPanel {
         tabs.addTab("Transition Diagram", createTransitionTab());
         tabs.setSelectedIndex(this.selected);
         add(tabs, BorderLayout.CENTER);
+
+        add(createControls(), BorderLayout.SOUTH);
     }
 
     private JPanel createDescriptionPanel() {
@@ -192,5 +205,23 @@ public class NetworkPanel extends JPanel {
             graph.addEdge(s.toString() + " -> " + nextState.toString(), s, nextState);
         }
         return graph;
+    }
+
+    private JPanel createControls() {
+        JPanel panel = new JPanel(new GridLayout(2,2));
+
+        JPanel stepControls = new JPanel(new GridLayout());
+        forwardButton = new JButton("Next");
+        backButton = new JButton("Previous");
+        stepControls.add(backButton);
+        stepControls.add(forwardButton);
+
+
+//        JPanel exportControls = new JPanel(new GridLayout());
+//        exportControls.add(new JButton("Export Graphs"));
+
+        panel.add(stepControls);
+        //panel.add(exportControls);
+        return panel;
     }
 }

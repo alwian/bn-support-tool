@@ -354,4 +354,16 @@ public class BooleanNetwork {
         }
         return new Trace(trace);
     }
+
+    public void update(int direction) {
+        if (direction == 1) {
+            this.currentState = this.transitions.get(this.currentState);
+        } else {
+            for (Map.Entry entry : transitions.entrySet()) {
+                if (entry.getValue().equals(this.currentState)) {
+                    this.currentState = (State) entry.getKey();
+                }
+            }
+        }
+    }
 }

@@ -33,6 +33,8 @@ public class Controller {
         view.getNetworkPanel().getWiringViewer().addKeyListener(view.getNetworkPanel().getWiringMouse().getModeKeyListener());
         view.getNetworkPanel().getTransitionViewer().getPickedVertexState().addItemListener(e -> changeState(e));
         view.getNetworkPanel().getTransitionViewer().addKeyListener(view.getNetworkPanel().getTransitionMouse().getModeKeyListener());
+        view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork(1));
+        view.getNetworkPanel().getBackButton().addActionListener(e -> updateNetwork(0));
     }
 
     private void displayError(String error) {
@@ -123,5 +125,10 @@ public class Controller {
             model.getNetwork().setCurrentState(vertex);
             updateView();
         }
+    }
+
+    private void updateNetwork(int direction) {
+        model.getNetwork().update(direction);
+        updateView();
     }
 }
