@@ -7,6 +7,9 @@ import ui.ModifierPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class View extends JFrame {
     private Model model;
@@ -30,7 +33,12 @@ public class View extends JFrame {
         this.frameMenuBar = new MenuBar();
         this.networkPanel = new NetworkPanel(model.getNetwork(), 0);
         this.exportButton = new JButton("Export State Graph");
-        this.modifierPanel = new ModifierPanel(model.getNetwork());
+
+        Map<String, Integer> buttonStates = new HashMap<>();
+        for (String node : model.getNetwork().getNodes()) {
+            buttonStates.put(node,0);
+        }
+        this.modifierPanel = new ModifierPanel(model.getNetwork(), buttonStates);
         this.infoPanel = new InfoPanel(model.getNetwork());
         this.openMenuItem = new JMenuItem("Open");
 
@@ -56,11 +64,11 @@ public class View extends JFrame {
         return title;
     }
 
-    public JPanel getTransitionPanel() {
+    public ModifierPanel getModifierPanel() {
         return modifierPanel;
     }
 
-    public void setTransitionPanel(ModifierPanel modifierPanel) {
+    public void setModifierPanel(ModifierPanel modifierPanel) {
         remove(this.modifierPanel);
         this.modifierPanel = modifierPanel;
         add(this.modifierPanel, BorderLayout.EAST);
@@ -70,8 +78,6 @@ public class View extends JFrame {
     public JMenuItem getOpenMenuItem() {
         return openMenuItem;
     }
-
-    public JButton getExportButton() { return exportButton; }
 
     public void setInfoPanel(InfoPanel infoPanel) {
         remove(this.infoPanel);

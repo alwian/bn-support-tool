@@ -10,6 +10,8 @@ import ui.ModifierPanel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.FileWriter;
@@ -35,6 +37,17 @@ public class Controller {
         view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork(1));
         view.getNetworkPanel().getBackButton().addActionListener(e -> updateNetwork(0));
         view.getNetworkPanel().getExportButton().addActionListener(e -> exportGraphs());
+
+        for (Object[] modifierRow : view.getModifierPanel().getModifierRows()) {
+            String nodeName = (String) modifierRow[0];
+            JRadioButton noneButton = (JRadioButton) modifierRow[1];
+            JRadioButton overButton = (JRadioButton) modifierRow[2];
+            JRadioButton knockButton = (JRadioButton) modifierRow[3];
+
+            noneButton.addActionListener(e -> updateModifier(nodeName, 0));
+            overButton.addActionListener(e -> updateModifier(nodeName, 1));
+            knockButton.addActionListener(e -> updateModifier(nodeName, -1));
+        }
     }
 
     private void displayError(String error) {
@@ -63,7 +76,7 @@ public class Controller {
     }
 
     private void updateView() {
-        view.setTransitionPanel(new ModifierPanel(model.getNetwork()));
+        view.setModifierPanel(new ModifierPanel(model.getNetwork(), view.getModifierPanel().getButtonStates()));
         view.setInfoPanel(new InfoPanel(model.getNetwork()));
         view.setNetworkPanel(new NetworkPanel(model.getNetwork(), view.getNetworkPanel().getTabs().getSelectedIndex()));
         initController();
@@ -143,5 +156,10 @@ public class Controller {
         }
         writer.append("}");
         writer.close();
+    }
+
+    private void updateModifier(String nodeName, int value) {
+        model.getNetwork().getModifiers().replace(nodeName, value);
+        view.getModifierPanel().getButtonStates().replace(nodeName, value);
     }
 }

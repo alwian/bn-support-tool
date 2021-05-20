@@ -373,12 +373,20 @@ public class BooleanNetwork {
 
     public void update(int direction) {
         if (direction == 1) {
-            this.currentState = this.transitions.get(this.currentState);
+            this.currentState = new State(this.transitions.get(this.currentState).getNodeStates().clone());
         } else {
             for (Map.Entry entry : transitions.entrySet()) {
                 if (entry.getValue().equals(this.currentState)) {
-                    this.currentState = (State) entry.getKey();
+                    this.currentState = new State(((State) entry.getKey()).getNodeStates().clone());
                 }
+            }
+        }
+
+        for (Map.Entry entry : modifiers.entrySet()) {
+            if ((int) entry.getValue() == 1) {
+                currentState.getNodeStates()[nodeIndexes.get((String) entry.getKey())] = 1;
+            } else if ((int) entry.getValue() == -1 ){
+                currentState.getNodeStates()[nodeIndexes.get((String) entry.getKey())] = 0;
             }
         }
     }
