@@ -35,7 +35,6 @@ public class ModifierPanel extends JPanel {
 
     private void build() {
         setLayout(new BorderLayout());
-        setBackground(Color.RED);
         setPreferredSize(new Dimension(400,100));
         setBorder(createBorder());
 
