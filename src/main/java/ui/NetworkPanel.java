@@ -3,20 +3,11 @@ package ui;
 
 
 import com.google.common.base.Function;
-import com.sun.org.apache.xml.internal.serializer.ToSAXHandler;
 import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.*;
-import edu.uci.ics.jung.graph.util.EdgeType;
-import edu.uci.ics.jung.graph.util.Pair;
-import edu.uci.ics.jung.visualization.Layer;
-import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.*;
-import edu.uci.ics.jung.visualization.decorators.EllipseVertexShapeTransformer;
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-import edu.uci.ics.jung.visualization.renderers.BasicEdgeArrowRenderingSupport;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
-import edu.uci.ics.jung.visualization.transform.MutableTransformer;
 import network.BooleanNetwork;
 import network.State;
 
@@ -24,7 +15,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 
 public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
@@ -40,12 +30,8 @@ public class NetworkPanel extends JPanel {
         return forwardButton;
     }
 
-    public JButton getBackButton() {
-        return backButton;
-    }
 
     private JButton forwardButton;
-    private JButton backButton;
 
     public JTabbedPane getTabs() {
         return tabs;
@@ -206,31 +192,20 @@ public class NetworkPanel extends JPanel {
     private Graph createTransitionGraph() {
         Graph<State, String> graph = new DirectedSparseGraph<>();
 
-        for (State s : network.getTransitions().keySet()) {
+        for (State s : network.getCurrentTransitions().keySet()) {
             graph.addVertex(s);
 
-            State nextState = network.getTransitions().get(s);
+            State nextState = network.getCurrentTransitions().get(s);
             graph.addEdge(s.toString() + " -> " + nextState.toString(), s, nextState);
         }
         return graph;
     }
 
     private JPanel createControls() {
-        JPanel panel = new JPanel(new GridLayout(2,2));
+        JPanel panel = new JPanel(new GridLayout(1,1));
 
-        JPanel stepControls = new JPanel(new GridLayout());
-        forwardButton = new JButton("Next");
-        backButton = new JButton("Previous");
-        stepControls.add(backButton);
-        stepControls.add(forwardButton);
-
-
-        JPanel exportControls = new JPanel(new GridLayout());
-        exportButton = new JButton("Export Graphs");
-        exportControls.add(exportButton);
-
-        panel.add(stepControls);
-        panel.add(exportControls);
+        forwardButton = new JButton("Update");
+        panel.add(forwardButton);
         return panel;
     }
 }

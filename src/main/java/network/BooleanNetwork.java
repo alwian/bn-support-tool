@@ -28,7 +28,13 @@ public class BooleanNetwork {
     /**
      * The transitions from each global state to the next.
      */
-    private Map<State, State> transitions = new HashMap<>();
+    private Map<State, State> originalTransitions = new HashMap<>();
+
+    public Map<State, State> getCurrentTransitions() {
+        return currentTransitions;
+    }
+
+    private Map<State, State> currentTransitions = new HashMap<>();
 
     public Map<String, List<String>> getDeterminants() {
         return determinants;
@@ -87,8 +93,8 @@ public class BooleanNetwork {
         return description;
     }
 
-    public Map<State, State> getTransitions() {
-        return transitions;
+    public Map<State, State> getOriginalTransitions() {
+        return originalTransitions;
     }
 
     /**
@@ -133,7 +139,8 @@ public class BooleanNetwork {
         List<List<List<String>>> tables = deconstructFile(path);
 
         for (int[] state : Util.getStartingStates(tables.size())) {
-            transitions.put(new State(state), new State(state.clone()));
+            originalTransitions.put(new State(state), new State(state.clone()));
+            currentTransitions.put(new State(state), new State(state.clone()));
         }
 
         for (List<List<String>> table : tables) {
@@ -141,6 +148,10 @@ public class BooleanNetwork {
         }
 
         reorder();
+
+        System.out.println(currentTransitions);
+        System.out.println(originalTransitions);
+
         getAllAttractors();
 
         int[] currentNodeStates = new int[nodes.length];
@@ -205,8 +216,8 @@ public class BooleanNetwork {
      *
      * @throws NetworkTraceException When an error occurs performing a trace.
      */
-    private void getAllAttractors() throws NetworkTraceException {
-        for (State startingState : transitions.keySet()) {
+    public void getAllAttractors() throws NetworkTraceException {
+        for (State startingState : currentTransitions.keySet()) {
             List<State> attractor = trace(startingState.getNodeStates()).attractor;
             boolean newAttractor = true;
 
@@ -266,7 +277,7 @@ public class BooleanNetwork {
             }
 
             // Update the transition map based on the current truth table.
-            for (State startingState : transitions.keySet()) {
+            for (State startingState : originalTransitions.keySet()) {
                 boolean allDeterminantsMatch = true;
 
                 // Go through all determinants.
@@ -289,8 +300,11 @@ public class BooleanNetwork {
 
                 // If all determinants match the current starting state, update the resulting state.
                 if (allDeterminantsMatch) {
-                    State finalState = transitions.get(startingState);
-                    finalState.getNodeStates()[nodeIndexes.get(nodeName)] = result;
+                    State originalFinalState = originalTransitions.get(startingState);
+                    originalFinalState.getNodeStates()[nodeIndexes.get(nodeName)] = result;
+
+                    State currentFinalState = currentTransitions.get(startingState);
+                    currentFinalState.getNodeStates()[nodeIndexes.get(nodeName)] = result;
                 }
             }
         }
@@ -311,12 +325,12 @@ public class BooleanNetwork {
         nodes = orderedNodes;
 
         // Go through the unordered starting states.
-        for (State unorderedStart : transitions.keySet()) {
+        for (State unorderedStart : originalTransitions.keySet()) {
             // New arrays to store the ordered states.
             int[] orderedStart = new int[nodeIndexes.size()];
             int[] orderedEnd = new int[nodeIndexes.size()];
 
-            int[] unorderedEnd = transitions.get(unorderedStart).getNodeStates();
+            int[] unorderedEnd = originalTransitions.get(unorderedStart).getNodeStates();
 
             // Go through each node and put it's corresponding value in the correct place.
             for (int x = 0; x < orderedNodes.length; x++) {
@@ -334,7 +348,7 @@ public class BooleanNetwork {
         }
 
         // Replace the old transition map.
-        transitions = orderedTransitions;
+        originalTransitions = orderedTransitions;
     }
 
     /**
@@ -357,7 +371,7 @@ public class BooleanNetwork {
 
         // Trace until an attractor is found.
         while (true) {
-            newState = transitions.get(currentState);
+            newState = currentTransitions.get(currentState);
 
             // Check if state has been seen before.
             if (trace.contains(newState)) {
@@ -371,23 +385,7 @@ public class BooleanNetwork {
         return new Trace(trace);
     }
 
-    public void update(int direction) {
-        if (direction == 1) {
-            this.currentState = new State(this.transitions.get(this.currentState).getNodeStates().clone());
-        } else {
-            for (Map.Entry entry : transitions.entrySet()) {
-                if (entry.getValue().equals(this.currentState)) {
-                    this.currentState = new State(((State) entry.getKey()).getNodeStates().clone());
-                }
-            }
-        }
-
-        for (Map.Entry entry : modifiers.entrySet()) {
-            if ((int) entry.getValue() == 1) {
-                currentState.getNodeStates()[nodeIndexes.get((String) entry.getKey())] = 1;
-            } else if ((int) entry.getValue() == -1 ){
-                currentState.getNodeStates()[nodeIndexes.get((String) entry.getKey())] = 0;
-            }
-        }
+    public void update() {
+        this.currentState = new State(this.currentTransitions.get(this.currentState).getNodeStates().clone());
     }
 }

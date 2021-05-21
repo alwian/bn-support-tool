@@ -11,8 +11,6 @@ import ui.ModifierPanel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.FileWriter;
@@ -37,9 +35,8 @@ public class Controller {
         view.getNetworkPanel().getWiringViewer().addKeyListener(view.getNetworkPanel().getWiringMouse().getModeKeyListener());
         view.getNetworkPanel().getTransitionViewer().getPickedVertexState().addItemListener(e -> changeState(e));
         view.getNetworkPanel().getTransitionViewer().addKeyListener(view.getNetworkPanel().getTransitionMouse().getModeKeyListener());
-        view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork(1));
-        view.getNetworkPanel().getBackButton().addActionListener(e -> updateNetwork(0));
-        view.getNetworkPanel().getExportButton().addActionListener(e -> exportGraphs());
+        view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork());
+        //view.getNetworkPanel().getExportButton().addActionListener(e -> exportGraphs());
 
         for (Object[] modifierRow : view.getModifierPanel().getModifierRows()) {
             String nodeName = (String) modifierRow[0];
@@ -119,8 +116,8 @@ public class Controller {
         }
     }
 
-    private void updateNetwork(int direction) {
-        model.getNetwork().update(direction);
+    private void updateNetwork() {
+        model.getNetwork().update();
         updateView();
     }
 
@@ -161,9 +158,9 @@ public class Controller {
         FileWriter writer = new FileWriter(path);
 
         writer.write("digraph export {\n");
-        for (State s : model.getNetwork().getTransitions().keySet()) {
+        for (State s : model.getNetwork().getOriginalTransitions().keySet()) {
             String from = s.toString().replaceAll("[\\[\\], ]", "");
-            String to = model.getNetwork().getTransitions().get(s).toString().replaceAll("[\\[\\], ]", "");
+            String to = model.getNetwork().getOriginalTransitions().get(s).toString().replaceAll("[\\[\\], ]", "");
             writer.append(String.format("\t%s -> %s\n", from, to));
         }
         writer.append("}");
@@ -173,5 +170,19 @@ public class Controller {
     private void updateModifier(String nodeName, int value) {
         model.getNetwork().getModifiers().replace(nodeName, value);
         view.getModifierPanel().getButtonStates().replace(nodeName, value);
+
+        for (Map.Entry entry : model.getNetwork().getCurrentTransitions().entrySet()) {
+            if (value == 0) {
+                ((State) entry.getValue()).getNodeStates()[model.getNetwork().getNodeIndexes().get(nodeName)] = model.getNetwork().getOriginalTransitions().get((State) entry.getKey()).getNodeStates()[model.getNetwork().getNodeIndexes().get(nodeName)];
+            } else if (value == 1 || value == -1) {
+                ((State) entry.getValue()).getNodeStates()[model.getNetwork().getNodeIndexes().get(nodeName)] = (value == 1 ? 1 : 0);
+            }
+        }
+        try {
+            model.getNetwork().getAllAttractors();
+        } catch (NetworkTraceException e) {
+            displayError(e.getMessage());
+        }
+        updateView();
     }
 }
