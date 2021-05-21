@@ -30,6 +30,12 @@ public class BooleanNetwork {
      */
     private Map<State, State> originalTransitions = new HashMap<>();
 
+    public Trace getCurrentTrace() {
+        return currentTrace;
+    }
+
+    private Trace currentTrace;
+
     public Map<State, State> getCurrentTransitions() {
         return currentTransitions;
     }
@@ -383,6 +389,7 @@ public class BooleanNetwork {
             trace.add(newState);
             currentState = newState;
         }
+        this.currentTrace = new Trace(trace);
         return new Trace(trace);
     }
 

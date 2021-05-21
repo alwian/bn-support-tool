@@ -87,7 +87,7 @@ public class Controller {
     private void updateView() {
         view.setFrameMenuBar(new MenuBar());
         view.setModifierPanel(new ModifierPanel(model.getNetwork(), view.getModifierPanel().getButtonStates()));
-        view.setInfoPanel(new InfoPanel(model.getNetwork()));
+        view.setInfoPanel(new InfoPanel(model.getNetwork(), view.getInfoPanel().getTabs().getSelectedIndex()));
         view.setNetworkPanel(new NetworkPanel(model.getNetwork(), view.getNetworkPanel().getTabs().getSelectedIndex()));
         initController();
     }
@@ -101,6 +101,8 @@ public class Controller {
             int currentState = model.getNetwork().getCurrentState().getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)];
             currentState = currentState == 0 ? 1 : 0;
             model.getNetwork().getCurrentState().getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)] = currentState;
+
+            reTraceNetwork();
             updateView();
         }
     }
@@ -112,6 +114,8 @@ public class Controller {
             State vertex = (State) selected;
             System.out.println(vertex + "selected.");
             model.getNetwork().setCurrentState(vertex);
+
+            reTraceNetwork();
             updateView();
         }
     }
@@ -185,6 +189,16 @@ public class Controller {
         } catch (NetworkTraceException e) {
             displayError(e.getMessage());
         }
+
+        reTraceNetwork();
         updateView();
+    }
+
+    private void reTraceNetwork() {
+        try {
+            model.getNetwork().trace(model.getNetwork().getCurrentState().getNodeStates());
+        } catch (NetworkTraceException e) {
+            displayError(e.getMessage());
+        }
     }
 }

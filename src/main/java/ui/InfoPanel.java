@@ -2,18 +2,30 @@ package ui;
 
 import network.BooleanNetwork;
 import network.State;
+import network.Trace;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class InfoPanel extends JPanel {
     BooleanNetwork network;
+    int selected;
 
-    public InfoPanel(BooleanNetwork network) {
+    public JTabbedPane getTabs() {
+        return tabs;
+    }
+
+    JTabbedPane tabs;
+
+    public InfoPanel(BooleanNetwork network, int selected) {
         this.network = network;
+        this.selected = selected;
         build();
     }
 
@@ -22,15 +34,54 @@ public class InfoPanel extends JPanel {
         setBackground(Color.black);
         setPreferredSize(new Dimension(100,200));
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Trace", createTraceTab());
-        tabbedPane.addTab("Attractors", createAttractorTab());
+        tabs = new JTabbedPane();
+        tabs.addTab("Trace", createTraceTab());
+        tabs.addTab("Attractors", createAttractorTab());
 
-        add(tabbedPane);
+        tabs.setSelectedIndex(this.selected);
+        add(tabs);
     }
 
     private JPanel createTraceTab() {
-        return new JPanel();
+        System.out.println("Making table");
+        JPanel panel = new JPanel(new GridLayout());
+
+        Trace trace = network.getCurrentTrace();
+        int length = trace.getTrace().size();
+
+        System.out.println(trace);
+        String[] columns = new String[length + 1];
+        columns[0] = "Node";
+        for (int x = 0; x < length; x++) {
+            columns[x + 1] = "t = " + x;
+            System.out.println("Added Column - t = " + x);
+        }
+        System.out.println(Arrays.toString(columns));
+
+        Object[][] data = new Object[network.getNodes().length][length + 1];
+        for (int x = 0; x < network.getNodes().length; x++) {
+            data[x][0] = network.getNodes()[x];
+            for (int y = 0; y < trace.getTrace().size(); y++) {
+                State state = trace.getTrace().get(y);
+                data[x][y + 1] = state.getNodeStates()[network.getNodeIndexes().get(network.getNodes()[x])];
+            }
+        }
+
+        for (Object[] row : data) {
+            System.out.println(Arrays.toString(row));
+        }
+
+        JTable table = new JTable(data, columns);
+        DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+        cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int x = 0; x < table.getColumnCount(); x++) {
+            table.setDefaultRenderer(table.getColumnClass(x), cellRenderer);
+        }
+        table.setEnabled(false);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        panel.add(scrollPane);
+        return panel;
     }
 
     private JPanel createAttractorTab() {

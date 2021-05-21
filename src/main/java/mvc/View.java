@@ -35,22 +35,25 @@ public class View extends JFrame {
 
     private NetworkPanel networkPanel;
     private ModifierPanel modifierPanel;
+
+    public InfoPanel getInfoPanel() {
+        return infoPanel;
+    }
+
     private InfoPanel infoPanel;
-    private JButton exportButton;
 
     public View(String title, Model m) {
         this.model = m;
         this.title = title;
         this.frameMenuBar = new MenuBar();
         this.networkPanel = new NetworkPanel(model.getNetwork(), 0);
-        this.exportButton = new JButton("Export State Graph");
 
         Map<String, Integer> buttonStates = new HashMap<>();
         for (String node : model.getNetwork().getNodes()) {
             buttonStates.put(node,0);
         }
         this.modifierPanel = new ModifierPanel(model.getNetwork(), buttonStates);
-        this.infoPanel = new InfoPanel(model.getNetwork());
+        this.infoPanel = new InfoPanel(model.getNetwork(), 0);
 
         setTitle(this.title);
         getContentPane().setLayout(new BorderLayout());
