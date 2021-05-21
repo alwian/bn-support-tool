@@ -16,6 +16,12 @@ public class MenuBar extends JMenuBar {
     JMenuItem exitOption;
     JMenuItem openOption;
 
+    public JMenuItem getExportOption() {
+        return exportOption;
+    }
+
+    JMenuItem exportOption;
+
     public MenuBar() {
         createFileMenu();
     }
@@ -24,9 +30,11 @@ public class MenuBar extends JMenuBar {
         JMenu fileMenu = new JMenu("File");
         exitOption = new JMenuItem("Exit");
         openOption = new JMenuItem("Open");
+        exportOption = new JMenuItem("Export Graphs");
 
         fileMenu.add(openOption);
-        fileMenu.add(openOption);
+        fileMenu.add(exportOption);
+        fileMenu.add(exitOption);
         add(fileMenu);
     }
 }

@@ -36,7 +36,7 @@ public class Controller {
         view.getNetworkPanel().getTransitionViewer().getPickedVertexState().addItemListener(e -> changeState(e));
         view.getNetworkPanel().getTransitionViewer().addKeyListener(view.getNetworkPanel().getTransitionMouse().getModeKeyListener());
         view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork());
-        //view.getNetworkPanel().getExportButton().addActionListener(e -> exportGraphs());
+        view.getFrameMenuBar().getExportOption().addActionListener(e -> exportGraphs());
 
         for (Object[] modifierRow : view.getModifierPanel().getModifierRows()) {
             String nodeName = (String) modifierRow[0];
