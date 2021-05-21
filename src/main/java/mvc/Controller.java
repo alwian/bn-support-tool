@@ -5,6 +5,7 @@ import network.NetworkCreationException;
 import network.NetworkTraceException;
 import network.State;
 import ui.InfoPanel;
+import ui.MenuBar;
 import ui.NetworkPanel;
 import ui.ModifierPanel;
 
@@ -16,6 +17,7 @@ import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +31,8 @@ public class Controller {
     }
 
     public void initController() {
-        view.getOpenMenuItem().addActionListener(e -> loadNetwork());
+        view.getFrameMenuBar().getExitOption().addActionListener(e -> close());
+        view.getFrameMenuBar().getOpenOption().addActionListener(e -> loadNetwork());
         view.getNetworkPanel().getWiringViewer().getPickedVertexState().addItemListener(e -> flipWiringNode(e));
         view.getNetworkPanel().getWiringViewer().addKeyListener(view.getNetworkPanel().getWiringMouse().getModeKeyListener());
         view.getNetworkPanel().getTransitionViewer().getPickedVertexState().addItemListener(e -> changeState(e));
@@ -54,6 +57,10 @@ public class Controller {
         JOptionPane.showMessageDialog(view, error, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    private void close() {
+        System.exit(0);
+    }
+
     private void loadNetwork() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -61,10 +68,15 @@ public class Controller {
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("csv", "csv"));
 
-        int returnValue = fileChooser.showOpenDialog(view);
+        int returnValue = fileChooser.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             try {
                 model.setNetwork(new BooleanNetwork(fileChooser.getSelectedFile().toString()));
+                Map<String, Integer> buttonStates = new HashMap<>();
+                for (String node : model.getNetwork().getNodes()) {
+                    buttonStates.put(node,0);
+                }
+                view.getModifierPanel().setButtonStates(buttonStates);
                 updateView();
                 System.out.println(model.getNetwork());
             } catch (IOException | NetworkCreationException | NetworkTraceException ex) {
@@ -76,6 +88,7 @@ public class Controller {
     }
 
     private void updateView() {
+        view.setFrameMenuBar(new MenuBar());
         view.setModifierPanel(new ModifierPanel(model.getNetwork(), view.getModifierPanel().getButtonStates()));
         view.setInfoPanel(new InfoPanel(model.getNetwork()));
         view.setNetworkPanel(new NetworkPanel(model.getNetwork(), view.getNetworkPanel().getTabs().getSelectedIndex()));
@@ -116,7 +129,6 @@ public class Controller {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fileChooser.setMultiSelectionEnabled(false);
         fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("dot", "dot"));
 
         int returnValue = fileChooser.showSaveDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {

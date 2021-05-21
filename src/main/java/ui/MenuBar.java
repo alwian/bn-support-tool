@@ -5,24 +5,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MenuBar extends JMenuBar {
+    public JMenuItem getExitOption() {
+        return exitOption;
+    }
+
+    public JMenuItem getOpenOption() {
+        return openOption;
+    }
+
+    JMenuItem exitOption;
+    JMenuItem openOption;
+
     public MenuBar() {
         createFileMenu();
     }
 
     private void createFileMenu() {
         JMenu fileMenu = new JMenu("File");
-        fileMenu.add(createExitOption());
-        add(fileMenu);
-    }
+        exitOption = new JMenuItem("Exit");
+        openOption = new JMenuItem("Open");
 
-    private JMenuItem createExitOption() {
-        JMenuItem exitOption = new JMenuItem("Exit");
-        exitOption.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-        return exitOption;
+        fileMenu.add(openOption);
+        fileMenu.add(openOption);
+        add(fileMenu);
     }
 }

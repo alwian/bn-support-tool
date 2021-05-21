@@ -15,6 +15,18 @@ public class View extends JFrame {
     private Model model;
 
     private String title;
+
+    public void setFrameMenuBar(MenuBar frameMenuBar) {
+        remove(this.frameMenuBar);
+        this.frameMenuBar = frameMenuBar;
+        setJMenuBar(this.frameMenuBar);
+        revalidate();
+    }
+
+    public MenuBar getFrameMenuBar() {
+        return frameMenuBar;
+    }
+
     private MenuBar frameMenuBar;
 
     public NetworkPanel getNetworkPanel() {
@@ -24,7 +36,6 @@ public class View extends JFrame {
     private NetworkPanel networkPanel;
     private ModifierPanel modifierPanel;
     private InfoPanel infoPanel;
-    private JMenuItem openMenuItem;
     private JButton exportButton;
 
     public View(String title, Model m) {
@@ -40,7 +51,6 @@ public class View extends JFrame {
         }
         this.modifierPanel = new ModifierPanel(model.getNetwork(), buttonStates);
         this.infoPanel = new InfoPanel(model.getNetwork());
-        this.openMenuItem = new JMenuItem("Open");
 
         setTitle(this.title);
         getContentPane().setLayout(new BorderLayout());
@@ -49,7 +59,6 @@ public class View extends JFrame {
         getContentPane().setBackground(Color.DARK_GRAY);
 
         setJMenuBar(this.frameMenuBar);
-        this.frameMenuBar.getMenu(0).add(this.openMenuItem);
 
         add(this.networkPanel, BorderLayout.CENTER);
         add(this.infoPanel, BorderLayout.SOUTH);
@@ -73,10 +82,6 @@ public class View extends JFrame {
         this.modifierPanel = modifierPanel;
         add(this.modifierPanel, BorderLayout.EAST);
         revalidate();
-    }
-
-    public JMenuItem getOpenMenuItem() {
-        return openMenuItem;
     }
 
     public void setInfoPanel(InfoPanel infoPanel) {

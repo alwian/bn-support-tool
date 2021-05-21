@@ -116,4 +116,8 @@ public class ModifierPanel extends JPanel {
 
         return containerPanel;
     }
+
+    public void setButtonStates(Map<String, Integer> buttonStates) {
+        this.buttonStates = buttonStates;
+    }
 }
