@@ -178,6 +178,8 @@ public class Controller {
                 ((State) entry.getValue()).getNodeStates()[model.getNetwork().getNodeIndexes().get(nodeName)] = (value == 1 ? 1 : 0);
             }
         }
+
+        model.getNetwork().getAttractors().clear();
         try {
             model.getNetwork().getAllAttractors();
         } catch (NetworkTraceException e) {

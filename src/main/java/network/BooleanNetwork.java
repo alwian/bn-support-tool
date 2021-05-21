@@ -222,6 +222,7 @@ public class BooleanNetwork {
             boolean newAttractor = true;
 
             for (List<State> attractor2 : attractors) {
+               // Set<State> newAttractorStates = new HashSet<>(attractor);
                 List<State> tempAttractor = new ArrayList<>(attractor);
                 tempAttractor.retainAll(attractor2);
 
@@ -245,7 +246,7 @@ public class BooleanNetwork {
      * @throws IOException When an error occurs reading the file at path.
      * @throws NetworkCreationException When there is an error in the truth table syntax.
      */
-    private void addNode(final List<List<String>> table) throws IOException, NetworkCreationException {
+    private void addNode(final List<List<String>> table) throws NetworkCreationException {
         // Extract the headings from the file.
         List<String> headings = table.remove(0);
 
