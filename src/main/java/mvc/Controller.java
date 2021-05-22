@@ -11,7 +11,10 @@ import ui.ModifierPanel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,25 +32,10 @@ public class Controller {
     }
 
     public void initController() {
-        view.getFrameMenuBar().getExitOption().addActionListener(e -> close());
-        view.getFrameMenuBar().getOpenOption().addActionListener(e -> loadNetwork());
-        view.getNetworkPanel().getWiringViewer().getPickedVertexState().addItemListener(e -> flipWiringNode(e));
-        view.getNetworkPanel().getWiringViewer().addKeyListener(view.getNetworkPanel().getWiringMouse().getModeKeyListener());
-        view.getNetworkPanel().getTransitionViewer().getPickedVertexState().addItemListener(e -> changeState(e));
-        view.getNetworkPanel().getTransitionViewer().addKeyListener(view.getNetworkPanel().getTransitionMouse().getModeKeyListener());
-        view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork());
-        view.getFrameMenuBar().getExportOption().addActionListener(e -> exportGraphs());
-
-        for (Object[] modifierRow : view.getModifierPanel().getModifierRows()) {
-            String nodeName = (String) modifierRow[0];
-            JRadioButton noneButton = (JRadioButton) modifierRow[1];
-            JRadioButton overButton = (JRadioButton) modifierRow[2];
-            JRadioButton knockButton = (JRadioButton) modifierRow[3];
-
-            noneButton.addActionListener(e -> updateModifier(nodeName, 0));
-            overButton.addActionListener(e -> updateModifier(nodeName, 1));
-            knockButton.addActionListener(e -> updateModifier(nodeName, -1));
-        }
+        setMenuListeners();
+        setNetworkListeners();
+        setInfoListeners();
+        setModifierListeners();
     }
 
     private void displayError(String error) {
@@ -74,7 +62,9 @@ public class Controller {
                     buttonStates.put(node,0);
                 }
                 view.getModifierPanel().setButtonStates(buttonStates);
-                updateView();
+                updateInfoPanel(true);
+                updateNetworkPanel();
+                updateModiferPanel();
                 System.out.println(model.getNetwork());
             } catch (IOException | NetworkCreationException | NetworkTraceException ex) {
                 System.out.println("Twas an error");
@@ -82,14 +72,6 @@ public class Controller {
                 displayError(ex.getMessage());
             }
         }
-    }
-
-    private void updateView() {
-        view.setFrameMenuBar(new MenuBar());
-        view.setModifierPanel(new ModifierPanel(model.getNetwork(), view.getModifierPanel().getButtonStates()));
-        view.setInfoPanel(new InfoPanel(model.getNetwork(), view.getInfoPanel().getTabs().getSelectedIndex()));
-        view.setNetworkPanel(new NetworkPanel(model.getNetwork(), view.getNetworkPanel().getTabs().getSelectedIndex()));
-        initController();
     }
 
     private void flipWiringNode(ItemEvent e) {
@@ -103,7 +85,8 @@ public class Controller {
             model.getNetwork().getCurrentState().getNodeStates()[model.getNetwork().getNodeIndexes().get(vertex)] = currentState;
 
             reTraceNetwork();
-            updateView();
+            updateInfoPanel(false);
+            updateNetworkPanel();
         }
     }
 
@@ -116,13 +99,14 @@ public class Controller {
             model.getNetwork().setCurrentState(vertex);
 
             reTraceNetwork();
-            updateView();
+            updateInfoPanel(false);
+            updateNetworkPanel();
         }
     }
 
     private void updateNetwork() {
         model.getNetwork().update();
-        updateView();
+        updateNetworkPanel();
     }
 
     private void exportGraphs() {
@@ -191,7 +175,8 @@ public class Controller {
         }
 
         reTraceNetwork();
-        updateView();
+        updateInfoPanel(true);
+        updateNetworkPanel();
     }
 
     private void reTraceNetwork() {
@@ -199,6 +184,82 @@ public class Controller {
             model.getNetwork().trace(model.getNetwork().getCurrentState().getNodeStates());
         } catch (NetworkTraceException e) {
             displayError(e.getMessage());
+        }
+    }
+
+    private void attractorSelected(MouseEvent e) {
+        Point point = e.getPoint();
+        int index = view.getInfoPanel().getAttractorsList().locationToIndex(point);
+
+        if (index == view.getInfoPanel().getSelectedAttractor()) {
+            view.getInfoPanel().setSelectedAttractor(-1);
+            view.getInfoPanel().getAttractorsList().clearSelection();
+            System.out.println("Attractor " + index + " deselected.");
+        } else {
+            view.getInfoPanel().setSelectedAttractor(index);
+            model.getNetwork().setCurrentState(model.getNetwork().getAttractors().get(index).get(0));
+            System.out.println("Attractor " + index + " selected.");
+        }
+        updateNetworkPanel();
+    }
+
+    private void updateNetworkPanel() {
+        view.setNetworkPanel(new NetworkPanel(model.getNetwork(), view.getNetworkPanel().getTabs().getSelectedIndex(), view.getInfoPanel().getSelectedAttractor()));
+        setNetworkListeners();
+    }
+
+    private void updateInfoPanel(boolean attractorsReset) {
+        view.setInfoPanel(new InfoPanel(model.getNetwork(), view.getInfoPanel().getTabs().getSelectedIndex(), attractorsReset ? -1 : view.getInfoPanel().getSelectedAttractor()));
+        setInfoListeners();
+    }
+
+    private void updateModiferPanel() {
+        HashMap<String, Integer> buttonStates = new HashMap<>();
+        for (String node : model.getNetwork().getNodes()) {
+            buttonStates.put(node, 0);
+        }
+        view.setModifierPanel(new ModifierPanel(model.getNetwork(), buttonStates));
+        setModifierListeners();
+    }
+
+//    private void updateModifierPanel() {
+//        view.setModifierPanel(new ModifierPanel(model.getNetwork(), view.getModifierPanel().getButtonStates()));
+//        setModifierListeners();
+//    }
+
+    private void setNetworkListeners() {
+        view.getNetworkPanel().getWiringViewer().getPickedVertexState().addItemListener(e -> flipWiringNode(e));
+        view.getNetworkPanel().getWiringViewer().addKeyListener(view.getNetworkPanel().getWiringMouse().getModeKeyListener());
+        view.getNetworkPanel().getTransitionViewer().getPickedVertexState().addItemListener(e -> changeState(e));
+        view.getNetworkPanel().getTransitionViewer().addKeyListener(view.getNetworkPanel().getTransitionMouse().getModeKeyListener());
+        view.getNetworkPanel().getForwardButton().addActionListener(e -> updateNetwork());
+    }
+
+    private void setMenuListeners() {
+        view.getFrameMenuBar().getExitOption().addActionListener(e -> close());
+        view.getFrameMenuBar().getOpenOption().addActionListener(e -> loadNetwork());
+        view.getFrameMenuBar().getExportOption().addActionListener(e -> exportGraphs());
+    }
+
+    private void setInfoListeners() {
+        view.getInfoPanel().getAttractorsList().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                attractorSelected(e);
+            }
+        });
+    }
+
+    private void setModifierListeners() {
+        for (Object[] modifierRow : view.getModifierPanel().getModifierRows()) {
+            String nodeName = (String) modifierRow[0];
+            JRadioButton noneButton = (JRadioButton) modifierRow[1];
+            JRadioButton overButton = (JRadioButton) modifierRow[2];
+            JRadioButton knockButton = (JRadioButton) modifierRow[3];
+
+            noneButton.addActionListener(e -> updateModifier(nodeName, 0));
+            overButton.addActionListener(e -> updateModifier(nodeName, 1));
+            knockButton.addActionListener(e -> updateModifier(nodeName, -1));
         }
     }
 }

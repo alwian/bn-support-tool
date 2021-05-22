@@ -8,14 +8,29 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.Arrays;
-import java.util.List;
 
 public class InfoPanel extends JPanel {
     BooleanNetwork network;
-    int selected;
+
+    public void setSelectedTab(int selectedTab) {
+        this.selectedTab = selectedTab;
+    }
+
+    int selectedTab;
+
+    public void setSelectedAttractor(int selectedAttractor) {
+        this.selectedAttractor = selectedAttractor;
+    }
+
+    private int selectedAttractor;
+
+    public JList getAttractorsList() {
+        return attractorsList;
+    }
+
+    private JList attractorsList;
 
     public JTabbedPane getTabs() {
         return tabs;
@@ -23,9 +38,10 @@ public class InfoPanel extends JPanel {
 
     JTabbedPane tabs;
 
-    public InfoPanel(BooleanNetwork network, int selected) {
+    public InfoPanel(BooleanNetwork network, int selectedTab, int selectedAttractor) {
         this.network = network;
-        this.selected = selected;
+        this.selectedTab = selectedTab;
+        this.selectedAttractor = selectedAttractor;
         build();
     }
 
@@ -38,7 +54,7 @@ public class InfoPanel extends JPanel {
         tabs.addTab("Trace", createTraceTab());
         tabs.addTab("Attractors", createAttractorTab());
 
-        tabs.setSelectedIndex(this.selected);
+        tabs.setSelectedIndex(this.selectedTab);
         add(tabs);
     }
 
@@ -90,6 +106,7 @@ public class InfoPanel extends JPanel {
         tab.setBorder(createBorder("The current network contains the following attractors"));
 
         JList attractorsList = extractAttractors();
+        this.attractorsList = attractorsList;
         tab.add(attractorsList);
 
         return tab;
@@ -120,5 +137,9 @@ public class InfoPanel extends JPanel {
         titledBorder.setTitleJustification(TitledBorder.CENTER);
 
         return titledBorder;
+    }
+
+    public int getSelectedAttractor() {
+        return this.selectedAttractor;
     }
 }

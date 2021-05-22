@@ -46,14 +46,14 @@ public class View extends JFrame {
         this.model = m;
         this.title = title;
         this.frameMenuBar = new MenuBar();
-        this.networkPanel = new NetworkPanel(model.getNetwork(), 0);
+        this.infoPanel = new InfoPanel(model.getNetwork(), 0, -1);
+        this.networkPanel = new NetworkPanel(model.getNetwork(), 0, infoPanel.getSelectedAttractor());
 
         Map<String, Integer> buttonStates = new HashMap<>();
         for (String node : model.getNetwork().getNodes()) {
             buttonStates.put(node,0);
         }
         this.modifierPanel = new ModifierPanel(model.getNetwork(), buttonStates);
-        this.infoPanel = new InfoPanel(model.getNetwork(), 0);
 
         setTitle(this.title);
         getContentPane().setLayout(new BorderLayout());
@@ -80,13 +80,6 @@ public class View extends JFrame {
         return modifierPanel;
     }
 
-    public void setModifierPanel(ModifierPanel modifierPanel) {
-        remove(this.modifierPanel);
-        this.modifierPanel = modifierPanel;
-        add(this.modifierPanel, BorderLayout.EAST);
-        revalidate();
-    }
-
     public void setInfoPanel(InfoPanel infoPanel) {
         remove(this.infoPanel);
         this.infoPanel = infoPanel;
@@ -98,6 +91,13 @@ public class View extends JFrame {
         remove(this.networkPanel);
         this.networkPanel = networkPanel;
         add(this.networkPanel, BorderLayout.CENTER);
+        revalidate();
+    }
+
+    public void setModifierPanel(ModifierPanel modifierPanel) {
+        remove(this.modifierPanel);
+        this.modifierPanel = modifierPanel;
+        add(this.modifierPanel, BorderLayout.EAST);
         revalidate();
     }
 }

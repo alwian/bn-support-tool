@@ -15,10 +15,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkPanel extends JPanel {
     private BooleanNetwork network;
-    private int selected;
+
+    public void setSelectedTab(int selectedTab) {
+        this.selectedTab = selectedTab;
+    }
+
+    private int selectedTab;
 
     public JButton getExportButton() {
         return exportButton;
@@ -53,6 +60,12 @@ public class NetworkPanel extends JPanel {
 
     private VisualizationViewer transitionViewer;
 
+    public void setDisplayedAttractor(int displayedAttractor) {
+        this.displayedAttractor = displayedAttractor;
+    }
+
+    private int displayedAttractor;
+
     public VisualizationViewer getTransitionViewer() {
         return transitionViewer;
     }
@@ -63,9 +76,10 @@ public class NetworkPanel extends JPanel {
 
     private DefaultModalGraphMouse transitionMouse;
 
-    public NetworkPanel(BooleanNetwork network, int selected) {
+    public NetworkPanel(BooleanNetwork network, int selectedTab, int toDisplay) {
         this.network = network;
-        this.selected = selected;
+        this.selectedTab = selectedTab;
+        this.displayedAttractor = toDisplay;
         build();
     }
 
@@ -81,7 +95,7 @@ public class NetworkPanel extends JPanel {
 
         tabs.addTab("Wiring Diagram", createWiringTab());
         tabs.addTab("Transition Diagram", createTransitionTab());
-        tabs.setSelectedIndex(this.selected);
+        tabs.setSelectedIndex(this.selectedTab);
         add(tabs, BorderLayout.CENTER);
 
         add(createControls(), BorderLayout.SOUTH);
@@ -192,12 +206,15 @@ public class NetworkPanel extends JPanel {
     private Graph createTransitionGraph() {
         Graph<State, String> graph = new DirectedSparseGraph<>();
 
-        for (State s : network.getCurrentTransitions().keySet()) {
+        List<State> toDisplay = displayedAttractor == -1 ? new ArrayList<>(network.getCurrentTransitions().keySet()) : network.getAttractors().get(displayedAttractor);
+
+        for (State s : toDisplay) {
             graph.addVertex(s);
 
             State nextState = network.getCurrentTransitions().get(s);
             graph.addEdge(s.toString() + " -> " + nextState.toString(), s, nextState);
         }
+
         return graph;
     }
 
