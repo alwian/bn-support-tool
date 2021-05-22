@@ -5,6 +5,7 @@ package ui;
 import com.google.common.base.Function;
 import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.*;
+import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.*;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
@@ -145,7 +146,7 @@ public class NetworkPanel extends JPanel {
         vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 
         Function<String, Paint> arrowPaint = i -> Color.WHITE;
-        vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
+        vv.getRenderContext().setArrowDrawPaintTransformer(arrowPaint);
 
         DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
         gm.setMode(ModalGraphMouse.Mode.PICKING);
@@ -153,8 +154,11 @@ public class NetworkPanel extends JPanel {
         this.wiringViewer = vv;
         this.wiringMouse = gm;
 
+        GraphZoomScrollPane scrollPane = new GraphZoomScrollPane(vv);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(vv);
+        panel.setBackground(Color.BLACK);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
         return panel;
     }
 
@@ -176,7 +180,7 @@ public class NetworkPanel extends JPanel {
         vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 
         Function<String, Paint> arrowPaint = i -> Color.WHITE;
-        vv.getRenderContext().setArrowDrawPaintTransformer(edgePaint);
+        vv.getRenderContext().setArrowDrawPaintTransformer(arrowPaint);
 
         DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
         gm.setMode(ModalGraphMouse.Mode.PICKING);
@@ -184,8 +188,11 @@ public class NetworkPanel extends JPanel {
         this.transitionViewer = vv;
         this.transitionMouse = gm;
 
+        GraphZoomScrollPane scrollPane = new GraphZoomScrollPane(vv);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(vv);
+        panel.setBackground(Color.BLACK);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
         return panel;
     }
 

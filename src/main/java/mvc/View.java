@@ -59,7 +59,6 @@ public class View extends JFrame {
         getContentPane().setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(Color.DARK_GRAY);
 
         setJMenuBar(this.frameMenuBar);
 
@@ -68,7 +67,6 @@ public class View extends JFrame {
         add(this.modifierPanel, BorderLayout.EAST);
 
         pack();
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
     }
 
