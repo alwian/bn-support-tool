@@ -59,7 +59,7 @@ public class View extends JFrame {
         getContentPane().setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
+        setResizable(false);
         setJMenuBar(this.frameMenuBar);
 
         add(this.networkPanel, BorderLayout.CENTER);

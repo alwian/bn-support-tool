@@ -108,23 +108,44 @@ public class NetworkPanel extends JPanel {
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setPreferredSize(new Dimension(100,125));
 
         JTextArea t = new JTextArea(title);
+        t.setWrapStyleWord(true);
+        t.setLineWrap(true);
         t.setEditable(false);
-        t.setForeground(Color.BLACK);
-        t.setBackground(Color.WHITE);
-        t.setFont(t.getFont().deriveFont(Font.BOLD));
+        t.setFocusable(false);
+        t.setFont(UIManager.getFont("Label.font"));
+        t.setFont(t.getFont().deriveFont(Font.BOLD).deriveFont(22f));
+        t.setBorder(BorderFactory.createEmptyBorder());
 
         JTextArea d = new JTextArea(description);
+        d.setLineWrap(true);
+        d.setWrapStyleWord(true);
         d.setEditable(false);
-        d.setForeground(Color.BLACK);
-        d.setBackground(Color.WHITE);
+        d.setFocusable(false);
+        d.setFont(d.getFont().deriveFont(14f));
 
-        panel.add(t);
-        panel.add(d);
+
+        JScrollPane titleScrollPane = new JScrollPane(t);
+        titleScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        titleScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0,0));
+        titleScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        titleScrollPane.getViewport().setBackground(Color.WHITE);
+
+        JScrollPane descriptionScrollPane = new JScrollPane(d);
+        descriptionScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        descriptionScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        descriptionScrollPane.getViewport().setBackground(Color.WHITE);
+
+        panel.add(titleScrollPane);
+        panel.add(Box.createRigidArea(new Dimension(10,10)));
+        panel.add(descriptionScrollPane);
 
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(20,20,20,20));
+
+
         return panel;
     }
 
