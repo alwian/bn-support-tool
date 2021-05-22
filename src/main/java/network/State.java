@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 /**
  * Class for storing the state of a network.
- *
  * @author Alex Anderson
  */
 public final class State {
@@ -15,21 +14,19 @@ public final class State {
     private final int[] nodeStates;
 
     /**
-     * Accessor for nodeStates.
-     *
-     * @return nodeStates
-     */
-    public int[] getNodeStates() {
-        return nodeStates;
-    }
-
-    /**
      * Constructor for a network state.
-     *
      * @param nodeStates The state of each node in the network.
      */
     public State(final int[] nodeStates) {
         this.nodeStates = nodeStates;
+    }
+
+    /**
+     * Accessor for nodeStates.
+     * @return nodeStates
+     */
+    public int[] getNodeStates() {
+        return nodeStates;
     }
 
     @Override

@@ -25,7 +25,7 @@ public class TraceTest {
         } catch (NetworkTraceException e) {
             fail(e.getMessage());
         }
-        assertArrayEquals(expectedAttractor, t.attractor.toArray());
+        assertArrayEquals(expectedAttractor, t.getAttractor().toArray());
     }
 
     @org.junit.Test
@@ -46,7 +46,7 @@ public class TraceTest {
         } catch (NetworkTraceException e) {
             fail(e.getMessage());
         }
-        assertArrayEquals(expectedAttractor, t.attractor.toArray());
+        assertArrayEquals(expectedAttractor, t.getAttractor().toArray());
     }
 
     @org.junit.Test
@@ -67,7 +67,7 @@ public class TraceTest {
         } catch (NetworkTraceException e) {
             fail(e.getMessage());
         }
-        assertArrayEquals(expectedAttractor, t.attractor.toArray());
+        assertArrayEquals(expectedAttractor, t.getAttractor().toArray());
     }
 
     @org.junit.Test
@@ -88,7 +88,7 @@ public class TraceTest {
         } catch (NetworkTraceException e) {
             fail(e.getMessage());
         }
-        assertArrayEquals(expectedAttractor, t.attractor.toArray());
+        assertArrayEquals(expectedAttractor, t.getAttractor().toArray());
     }
 
     @org.junit.Test
@@ -109,7 +109,7 @@ public class TraceTest {
         } catch (NetworkTraceException e) {
             fail(e.getMessage());
         }
-        assertArrayEquals(expectedAttractor, t.attractor.toArray());
+        assertArrayEquals(expectedAttractor, t.getAttractor().toArray());
     }
 
     @org.junit.Test

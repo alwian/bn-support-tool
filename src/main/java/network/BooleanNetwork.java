@@ -10,7 +10,6 @@ import java.util.*;
 
 /**
  * Class for creating and tracing a Boolean network.
- *
  * @author Alex Anderson
  */
 public class BooleanNetwork {
@@ -30,31 +29,25 @@ public class BooleanNetwork {
      */
     private Map<State, State> originalTransitions = new HashMap<>();
 
-    public Trace getCurrentTrace() {
-        return currentTrace;
-    }
-
-    private Trace currentTrace;
-
-    public Map<State, State> getCurrentTransitions() {
-        return currentTransitions;
-    }
-
+    /**
+     * Transition map based on any modifiers applied to the network.
+     */
     private Map<State, State> currentTransitions = new HashMap<>();
 
-    public Map<String, List<String>> getDeterminants() {
-        return determinants;
-    }
+    /**
+     * The most recent trace performed.
+     */
+    private Trace currentTrace;
 
+    /**
+     * Which nodes determine the state of a given node.
+     */
     private Map<String, List<String>> determinants = new HashMap<>();
 
-    public Map<String, Integer> getModifiers() {
-        return modifiers;
-    }
-
+    /**
+     * Modifiers (OE and KO) applied the nodes in the network.
+     */
     private Map<String, Integer> modifiers = new HashMap<>();
-
-
 
     /**
      * All of the attractors in the network.
@@ -71,63 +64,13 @@ public class BooleanNetwork {
      */
     private String[] nodes;
 
-    public void setCurrentState(State currentState) {
-        this.currentState = currentState;
-    }
-
-    public State getCurrentState() {
-        return currentState;
-    }
-
+    /**
+     * The current state of the network.
+     */
     private State currentState;
 
     /**
-     * Accessor for title.
-     *
-     * @return title
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * Accessor for description.
-     *
-     * @return description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    public Map<State, State> getOriginalTransitions() {
-        return originalTransitions;
-    }
-
-    /**
-     * Gets all of the attractors in the network.
-     *
-     * @return All of the attractors in the network.
-     */
-    public List<List<State>> getAttractors() {
-        return attractors;
-    }
-
-    /**
-     * Accessor for nodes.
-     *
-     * @return nodes
-     */
-    public String[] getNodes() {
-        return nodes;
-    }
-
-    public Map<String, Integer> getNodeIndexes() {
-        return nodeIndexes;
-    }
-
-    /**
      * Constructor for BooleanNetwork.
-     *
      * @param path The path to node truth tables.
      * @throws IOException When reading a file fails.
      * @throws NetworkCreationException When there is an error in a files syntax.
@@ -165,13 +108,108 @@ public class BooleanNetwork {
         currentState = new State(currentNodeStates);
 
         for (String node : nodes) {
-            modifiers.put(node,0);
+            modifiers.put(node, 0);
         }
     }
 
     /**
+     * Accessor for title.
+     * @return title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Accessor for description.
+     * @return description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Getter for the original transition table.
+     * @return The original transition table.
+     */
+    public Map<State, State> getOriginalTransitions() {
+        return originalTransitions;
+    }
+
+    /**
+     * Getter for the current updated transition table.
+     * @return The current transition table.
+     */
+    public Map<State, State> getCurrentTransitions() {
+        return currentTransitions;
+    }
+
+    /**
+     * Getter for the most recent trace.
+     * @return The most recent trace.
+     */
+    public Trace getCurrentTrace() {
+        return currentTrace;
+    }
+
+    /**
+     * Getter the node determinants.
+     * @return Node determinants.
+     */
+    public Map<String, List<String>> getDeterminants() {
+        return determinants;
+    }
+
+    /**
+     * Getter for the modifiers applied to the network.
+     * @return The network modifiers.
+     */
+    public Map<String, Integer> getModifiers() {
+        return modifiers;
+    }
+
+    /**
+     * Gets all of the attractors in the network.
+     * @return All of the attractors in the network.
+     */
+    public List<List<State>> getAttractors() {
+        return attractors;
+    }
+
+    /**
+     * Getter for the indexes of each node.
+     * @return The indexes of each node.
+     */
+    public Map<String, Integer> getNodeIndexes() {
+        return nodeIndexes;
+    }
+
+    /**
+     * Accessor for nodes.
+     * @return nodes
+     */
+    public String[] getNodes() {
+        return nodes;
+    }
+
+    /**
+     * Getter for the current state of the network.
+     * @return The current state of the network.
+     */
+    public State getCurrentState() {
+        return currentState;
+    }
+
+    /**
+     * Setter for the current state of the network.
+     * @param currentState The new state.
+     */
+    public void setCurrentState(final State currentState) {
+        this.currentState = currentState;
+    }
+
+    /**
      * Splits up a network file into individual truth tables.
-     *
      * @param path The path to the network file.
      * @return List of truth tables.
      * @throws IOException When an error occurs reading the file.
@@ -219,12 +257,11 @@ public class BooleanNetwork {
 
     /**
      * Creates all possible traces.
-     *
      * @throws NetworkTraceException When an error occurs performing a trace.
      */
     public void getAllAttractors() throws NetworkTraceException {
         for (State startingState : currentTransitions.keySet()) {
-            List<State> attractor = trace(startingState.getNodeStates()).attractor;
+            List<State> attractor = trace(startingState.getNodeStates()).getAttractor();
             boolean newAttractor = true;
 
             for (List<State> attractor2 : attractors) {
@@ -247,9 +284,7 @@ public class BooleanNetwork {
     /**
      * Takes in a truth table for a node and
      * updates the transition map to reflect the truth table.
-     *
      * @param table Truth table for the node to add.
-     * @throws IOException When an error occurs reading the file at path.
      * @throws NetworkCreationException When there is an error in the truth table syntax.
      */
     private void addNode(final List<List<String>> table) throws NetworkCreationException {
@@ -360,7 +395,6 @@ public class BooleanNetwork {
 
     /**
      * Creates a trace of the network.
-     *
      * @param startingState Initial state of the network.
      * @return A trace object containing the trace.
      * @throws NetworkTraceException When the starting state is invalid.
@@ -393,6 +427,9 @@ public class BooleanNetwork {
         return new Trace(trace);
     }
 
+    /**
+     * Advances the network a step based on the defined next stage rules.
+     */
     public void update() {
         this.currentState = new State(this.currentTransitions.get(this.currentState).getNodeStates().clone());
     }

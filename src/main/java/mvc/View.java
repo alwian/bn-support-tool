@@ -7,54 +7,60 @@ import ui.ModifierPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The UI for the tool.
+ * @author Alex Anderson
+ */
 public class View extends JFrame {
-    private Model model;
 
-    private String title;
+    /**
+     * The title of the tool.
+     */
+    private final String title;
 
-    public void setFrameMenuBar(MenuBar frameMenuBar) {
-        remove(this.frameMenuBar);
-        this.frameMenuBar = frameMenuBar;
-        setJMenuBar(this.frameMenuBar);
-        revalidate();
-    }
+    /**
+     * The menu bar of the tool.
+     */
+    private final MenuBar frameMenuBar;
 
-    public MenuBar getFrameMenuBar() {
-        return frameMenuBar;
-    }
-
-    private MenuBar frameMenuBar;
-
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
-    }
-
+    /**
+     * The graph / description section of the tool.
+     */
     private NetworkPanel networkPanel;
+
+    /**
+     * The panel for over-expression and knock-out.
+     */
     private ModifierPanel modifierPanel;
 
-    public InfoPanel getInfoPanel() {
-        return infoPanel;
-    }
-
+    /**
+     * The trace and attractor panel of the tool.
+     */
     private InfoPanel infoPanel;
 
+    /**
+     * Constructor the UI.
+     * @param title The title of the tool.
+     * @param m The model to use for the tool.
+     */
     public View(String title, Model m) {
-        this.model = m;
         this.title = title;
+
+        // Create UI components.
         this.frameMenuBar = new MenuBar();
-        this.infoPanel = new InfoPanel(model.getNetwork(), 0, -1);
-        this.networkPanel = new NetworkPanel(model.getNetwork(), 0, infoPanel.getSelectedAttractor());
+        this.infoPanel = new InfoPanel(m.getNetwork(), 0, -1);
+        this.networkPanel = new NetworkPanel(m.getNetwork(), 0, infoPanel.getSelectedAttractor());
 
         Map<String, Integer> buttonStates = new HashMap<>();
-        for (String node : model.getNetwork().getNodes()) {
+        for (String node : m.getNetwork().getNodes()) {
             buttonStates.put(node,0);
         }
-        this.modifierPanel = new ModifierPanel(model.getNetwork(), buttonStates);
+        this.modifierPanel = new ModifierPanel(m.getNetwork(), buttonStates);
 
+        // Put the UI together.
         setTitle(this.title);
         getContentPane().setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,21 +76,50 @@ public class View extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Getter for title.
+     * @return The tool title.
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Getter for the menu bar.
+     * @return The tool menu bar.
+     */
+    public MenuBar getFrameMenuBar() {
+        return frameMenuBar;
+    }
+
+    /**
+     * Getter for the network panel.
+     * @return The tool network panel.
+     */
+    public NetworkPanel getNetworkPanel() {
+        return networkPanel;
+    }
+
+    /**
+     * Getter for the modifier panel.
+     * @return The tool modifier panel.
+     */
     public ModifierPanel getModifierPanel() {
         return modifierPanel;
     }
 
-    public void setInfoPanel(InfoPanel infoPanel) {
-        remove(this.infoPanel);
-        this.infoPanel = infoPanel;
-        add(this.infoPanel, BorderLayout.SOUTH);
-        revalidate();
+    /**
+     * Getter for the info panel.
+     * @return The tool info panel.
+     */
+    public InfoPanel getInfoPanel() {
+        return infoPanel;
     }
 
+    /**
+     * Setter for the network panel to replace it.
+     * @param networkPanel The new panel.
+     */
     public void setNetworkPanel(NetworkPanel networkPanel) {
         remove(this.networkPanel);
         this.networkPanel = networkPanel;
@@ -92,10 +127,25 @@ public class View extends JFrame {
         revalidate();
     }
 
+    /**
+     * Setter for the modifier panel to replace it.
+     * @param modifierPanel The new panel.
+     */
     public void setModifierPanel(ModifierPanel modifierPanel) {
         remove(this.modifierPanel);
         this.modifierPanel = modifierPanel;
         add(this.modifierPanel, BorderLayout.EAST);
+        revalidate();
+    }
+
+    /**
+     * Setter for the info panel to replace it.
+     * @param infoPanel The new panel.
+     */
+    public void setInfoPanel(InfoPanel infoPanel) {
+        remove(this.infoPanel);
+        this.infoPanel = infoPanel;
+        add(this.infoPanel, BorderLayout.SOUTH);
         revalidate();
     }
 }

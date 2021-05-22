@@ -1,37 +1,70 @@
 package ui;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+/**
+ * The menu bar of the tool.
+ * @author Alex Anderson
+ */
 public class MenuBar extends JMenuBar {
-    public JMenuItem getExitOption() {
-        return exitOption;
-    }
 
-    public JMenuItem getOpenOption() {
-        return openOption;
-    }
+    /**
+     * The exit menu option.
+     */
+    private JMenuItem exitOption;
 
-    JMenuItem exitOption;
-    JMenuItem openOption;
+    /**
+     * The open menu option.
+     */
+    private JMenuItem openOption;
 
-    public JMenuItem getExportOption() {
-        return exportOption;
-    }
+    /**
+     * The export menu option.
+     */
+    private JMenuItem exportOption;
 
-    JMenuItem exportOption;
-
+    /**
+     * Constructor for the menu bar.
+     */
     public MenuBar() {
         createFileMenu();
     }
 
+    /**
+     * Getter for the exit option.
+     * @return The exit option button.
+     */
+    public JMenuItem getExitOption() {
+        return exitOption;
+    }
+
+    /**
+     * Getter for the open option.
+     * @return The open option button.
+     */
+    public JMenuItem getOpenOption() {
+        return openOption;
+    }
+
+    /**
+     * Getter for the export option.
+     * @return The export option button.
+     */
+    public JMenuItem getExportOption() {
+        return exportOption;
+    }
+
+    /**
+     * Constructs the file menu.
+     */
     private void createFileMenu() {
+        // Create the menu options.
         JMenu fileMenu = new JMenu("File");
         exitOption = new JMenuItem("Exit");
         openOption = new JMenuItem("Open");
         exportOption = new JMenuItem("Export Graphs");
 
+        // Add them to the menu bar.
         fileMenu.add(openOption);
         fileMenu.add(exportOption);
         fileMenu.add(exitOption);
