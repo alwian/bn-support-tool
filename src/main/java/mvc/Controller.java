@@ -222,10 +222,10 @@ public class Controller {
         // Start graph.
         writer.write("digraph export {\n");
         // Go through each starting state.
-        for (State s : model.getNetwork().getOriginalTransitions().keySet()) {
+        for (State s : model.getNetwork().getCurrentTransitions().keySet()) {
             // Write edge between starting and resulting state.
             String from = s.toString().replaceAll("[\\[\\], ]", "");
-            String to = model.getNetwork().getOriginalTransitions().get(s).toString().replaceAll("[\\[\\], ]", "");
+            String to = model.getNetwork().getCurrentTransitions().get(s).toString().replaceAll("[\\[\\], ]", "");
             writer.append(String.format("\t%s -> %s\n", from, to));
         }
         writer.append("}");
