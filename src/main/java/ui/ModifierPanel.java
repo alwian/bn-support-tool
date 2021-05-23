@@ -134,7 +134,6 @@ public class ModifierPanel extends JPanel {
 
         // Go through every node.
         for (Map.Entry entry : network.getModifiers().entrySet()) {
-            System.out.println(entry);
             Object[] rowItems = new Object[4];
             rowItems[0] = entry.getKey();
 

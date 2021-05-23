@@ -289,12 +289,10 @@ public class Controller {
         if (index == view.getInfoPanel().getSelectedAttractor()) {
             view.getInfoPanel().setSelectedAttractor(-1);
             view.getInfoPanel().getAttractorsList().clearSelection();
-            System.out.println("Attractor " + index + " deselected.");
         // If attractor wasn't selected, select it.
         } else {
             view.getInfoPanel().setSelectedAttractor(index);
             model.getNetwork().setCurrentState(model.getNetwork().getAttractors().get(index).get(0));
-            System.out.println("Attractor " + index + " selected.");
         }
 
         // Update UI to show the selected attractor or transition graph.

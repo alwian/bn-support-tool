@@ -98,9 +98,6 @@ public class BooleanNetwork {
 
         reorder();
 
-        System.out.println(currentTransitions);
-        System.out.println(originalTransitions);
-
         getAllAttractors();
 
         int[] currentNodeStates = new int[nodes.length];
