@@ -5,14 +5,12 @@ import java.util.List;
 
 /**
  * Class containing utility methods.
- *
  * @author Alex Anderson
  */
 public class Util {
 
     /**
      * Generates all the possible starting states of a given size.
-     *
      * @param nodeCount Number of nodes in the network.
      * @return All possible starting states.
      */

@@ -5,49 +5,47 @@ import java.util.List;
 /**
  * Class for storing the trace of a network
  * and its attractor.
- *
  * @author Alex Anderson
  */
 public final class Trace {
-
-    /**
-     * The starting state of the network.
-     */
-    private final int[] startingState;
-
     /**
      * The trace created from the starting state.
      */
-    private List<State> trace;
+    private final List<State> trace;
+
 
     /**
      * The attractor for the given trace.
      */
-    public List<State> attractor;
+    private final List<State> attractor;
 
     /**
-     * Accessor for trace.
-     *
-     * @return trace
+     * Constructor for a network trace.
+     * @param trace The trace for the given starting state.
+     */
+    public Trace(final List<State> trace) {
+        this.trace = trace;
+        this.attractor = findAttractor();
+    }
+
+    /**
+     * Getter for trace.
+     * @return The stored trace.
      */
     public List<State> getTrace() {
         return trace;
     }
 
     /**
-     * Constructor for a network trace.
-     *
-     * @param trace The trace for the given starting state.
+     * Getter for the attractor of the trace.
+     * @return The attractor for the trace.
      */
-    public Trace(final List<State> trace) {
-        this.startingState = trace.get(0).getNodeStates();
-        this.trace = trace;
-        this.attractor = findAttractor();
+    public List<State> getAttractor() {
+        return attractor;
     }
 
     /**
      * Finds the attractor in the trace.
-     *
      * @return The attractor of the trace.
      */
     private List<State> findAttractor() {
