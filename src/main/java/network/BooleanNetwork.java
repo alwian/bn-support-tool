@@ -97,7 +97,6 @@ public class BooleanNetwork {
         }
 
         reorder();
-
         getAllAttractors();
 
         int[] currentNodeStates = new int[nodes.length];
@@ -379,6 +378,7 @@ public class BooleanNetwork {
 
             // Store the ordered transition in the new map.
             orderedTransitions.put(new State(orderedStart), new State(orderedEnd));
+            currentTransitions.put(new State(orderedStart), new State(orderedEnd));
         }
 
         // Update the node indexes to reflect the new positions.
