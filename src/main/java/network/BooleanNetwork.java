@@ -378,7 +378,7 @@ public class BooleanNetwork {
 
             // Store the ordered transition in the new map.
             orderedTransitions.put(new State(orderedStart), new State(orderedEnd));
-            currentTransitions.put(new State(orderedStart), new State(orderedEnd));
+            currentTransitions.put(new State(orderedStart.clone()), new State(orderedEnd.clone()));
         }
 
         // Update the node indexes to reflect the new positions.
