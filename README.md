@@ -3,7 +3,7 @@ This tool was developed as part of my dissertation for MComp Computer Science at
 
 ## Usage
 
-To use the tool you must first put the network you wish to analyse into the required format, for this tool the format used is a set of truth tables for each entity in the network. Some example networks can be found in *test_files/*. As well as the truth tables there is the option of adding a title and description for the network, this is demonstrated in *test_files/test_case_1.txt*. 
+To use the tool you must first put the network you wish to analyse into the required format, for this tool the format used is a set of truth tables for each entity in the network. Some example networks can be found in *test_files/*. As well as the truth tables there is the option of adding a title and description for the network, this is demonstrated in *test_files/test_case_1.csv*. 
 
 The tool has functionality for performing a trace of a network, identifying attractors , and applying modifiers (over-expression and knock-out). All of these behaviours can be seen in the visualisations created by the tool which show a wiring and state transition diagram.
 
